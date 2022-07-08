@@ -17,8 +17,6 @@ require_once(SLOODLE_DIRROOT.'/view/base/base_view_module.php');
 define('SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT', 1639271151); // start the process to give the object
 
 
-
-
 /**
 * Class for rendering a view of a Distributor module in Moodle.
 * @package sloodle
@@ -36,9 +34,11 @@ class sloodle_view_distributor extends sloodle_base_view_module
     /**
     * Constructor.
     */
-    function sloodle_base_view_module()
+    //function sloodle_base_view_module()
+    function __construct()
     {
     }
+
 
     /**
     * Processes request data to determine which Distributor is being accessed.
@@ -48,8 +48,9 @@ class sloodle_view_distributor extends sloodle_base_view_module
         // Process the basic data
         parent::process_request();
         // Grab the Distributor data
-        if (!$this->distributor = sloodle_get_record('sloodle_distributor', 'sloodleid', $this->sloodle->id)) error('Failed to get SLOODLE Distributor data.');
+        if (!$this->distributor = sloodle_get_record('sloodle_distributor', 'sloodleid', $this->sloodle->id)) print_error('Failed to get SLOODLE Distributor data.');
     }
+
 
     /**
     * Process any form data which has been submitted.
@@ -82,19 +83,16 @@ class sloodle_view_distributor extends sloodle_base_view_module
         if (!is_array($entries)) $entries = array();
         $numitems = count($entries);
         
-        
         // A particular default user can be requested (by avatar name) in the HTTP parameters.
         // This could be used with a "send to this avatar" button on a Sloodle user profile.
         $defaultavatar = optional_param('defaultavatar', null, PARAM_TEXT);
         
-        
         // // SEND OBJECT // //
-        
         // If the user and object parameters are set, then try to send an object
         if (isset($_REQUEST['user'])) $send_user = $_REQUEST['user'];
         if (isset($_REQUEST['object'])) $send_object = $_REQUEST['object'];
-        if (!empty($send_user) && !empty($send_object)) {
 
+        if (!empty($send_user) && !empty($send_object)) {
             // Convert the HTML entities back again
             $send_object = htmlentities(stripslashes($send_object));
 
@@ -125,7 +123,8 @@ class sloodle_view_distributor extends sloodle_base_view_module
                         if ($statusline > 0) {
                             $ok = true;
                             break;
-                        } else {
+                        }
+                        else {
                             // Other lines should be errors.
                             // We'll ignore anything we don't understand.
                             foreach($responselines as $line) {
@@ -134,10 +133,10 @@ class sloodle_view_distributor extends sloodle_base_view_module
                                 }
                             }
                         }
-                    } else {
+                    }
+                    else {
                         $errors['messagesendingfailed'] = true;
                     }
-
                 }
             }
 
@@ -151,20 +150,19 @@ class sloodle_view_distributor extends sloodle_base_view_module
             sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow centerpara');
             if ($ok) {
                 print '<h3 style="color:green;text-align:center;">'.get_string('sloodleobjectdistributor:successful','sloodle').'</h3>';
-            } else {
+            }
+            else {
                 print '<h3 style="color:red;text-align:center;">'.get_string('sloodleobjectdistributor:failed','sloodle').'</h3>';
             }
             print '<p style="text-align:center;">';
-                print get_string('Object','sloodle').': '.$send_object.'<br/>';
-                print get_string('uuid','sloodle').': '.$send_user.'<br/>';
-                //print get_string('xmlrpc:channel','sloodle').': '.$this->distributor->channel.'<br/>';
-                print '</p>';
+            print get_string('Object','sloodle').': '.$send_object.'<br />';
+            print get_string('uuid','sloodle').': '.$send_user.'<br />';
+            //print get_string('xmlrpc:channel','sloodle').': '.$this->distributor->channel.'<br />';
+            print '</p>';
             sloodle_print_box_end();
         }
         
         // // ----------- // //
-        
-
         // If there are no items in the distributor, then simply display an error message
         if ($numitems < 1) sloodle_print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:noobjects','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
         //error(get_string('sloodleobjectdistributor:noobjects','sloodle'));
@@ -212,8 +210,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
         // Start of the sending forms
         sloodle_print_box_start('generalbox boxaligncenter boxwidthnormal centerpara');
         
-    // // SEND TO SELF // //
-        
+        // // SEND TO SELF // //
         // Start the form
         echo '<form action="" method="POST">';
         
@@ -226,7 +223,8 @@ class sloodle_view_distributor extends sloodle_base_view_module
         $this->sloodleuser = sloodle_get_record('sloodle_users', 'userid', $USER->id);
         if (!$this->sloodleuser) {
             $table_sendtoself->data[] = array('<span style="color:red;">'.get_string('avatarnotlinked','sloodle').'</span>');
-        } else {
+        }
+        else {
             // Output the hidden form data
             echo <<<XXXEODXXX
  <input type="hidden" name="s" value="{$this->sloodle->id}">
@@ -245,13 +243,11 @@ XXXEODXXX;
         // End the form
         echo "</form>";
         
-        
         // Only show the other options if the user has permission to edit stuff
         if ($this->canedit) {
-        // // SEND TO ANOTHER AVATAR // //
-            
+            // // SEND TO ANOTHER AVATAR // //
             // Start the form
-            echo '<br><form action="" method="POST">';
+            echo '<br /><form action="" method="POST">';
             
             // Use a table for layout
             $table = new stdClass();
@@ -261,7 +257,8 @@ XXXEODXXX;
             // Do we have any avatars?
             if (count($avatars) < 1) {
                 $table->data[] = array('<span style="color:red;">'.get_string('nosloodleusers','sloodle').'</span>');
-            } else {
+            }
+            else {
                 // Output the hidden form data
                 echo <<<XXXEODXXX
      <input type="hidden" name="s" value="{$this->sloodle->id}">
@@ -280,10 +277,9 @@ XXXEODXXX;
             // End the form
             echo "</form>";
             
-        // // SEND TO A CUSTOM AVATAR // //
-            
+            // // SEND TO A CUSTOM AVATAR // //
             // Start the form
-            echo '<br><form action="" method="post">';
+            echo '<br /><form action="" method="post">';
             
             // Use a table for layout
             $table = new stdClass();
@@ -307,16 +303,9 @@ XXXEODXXX;
             
             // End the form
             echo "</form>";
-            
-        // // ---------- // //
         }
-    
-        
         sloodle_print_box_end();
-    
     }
 
 }
 
-
-?>

@@ -209,19 +209,20 @@
         $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
-        //    error(get_string('objectauthnocontrollers','sloodle'));
+        //    print_error(get_string('objectauthnocontrollers','sloodle'));
          //   exit();
         }
 
         foreach ($recs as $r) {
             // Fetch the course module
             $cm = get_coursemodule_from_instance('sloodle', $r->id);
-	    $hasControllers = true;
+	        $hasControllers = true;
             // Check that the person can authorise objects of this module
-            if (has_capability('mod/sloodle:objectauth', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            //if (has_capability('mod/sloodle:objectauth', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            if (has_capability('mod/sloodle:objectauth', context_module::instance($cm->id))) {
                 // Store this controller
                 $controllers[$cm->course][$cm->id] = $r;
-		$hasControllersWithPermission = true;
+		        $hasControllersWithPermission = true;
             }
         }
 

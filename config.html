@@ -35,7 +35,7 @@
     
     // Display a help button regarding the version numbers
     echo '<div style="text-align:center;">(';
-    sloodle_helpbutton('version_numbers', get_string('help:versionnumbers', 'sloodle'), 'sloodle', true, true);
+    echo $OUTPUT->help_icon('help:versionnumbers', 'sloodle');
     echo ')</div>';
 ?>
 
@@ -66,7 +66,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('autoreg', 'sloodle'); ?> <?php echo sloodle_helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('autoreg', 'sloodle'); ?> <?php echo $OUTPUT->help_icon('help:autoreg','sloodle'); ?></h3>
         <p>
          <?php
             print_string("autoreg:allowforsite", "sloodle");
@@ -81,7 +81,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('autoenrol', 'sloodle'); ?> <?php echo sloodle_helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('autoenrol', 'sloodle'); ?> <?php echo $OUTPUT->help_icon('help:autoenrol','sloodle'); ?></h3>
         <p>
          <?php
             print_string("autoenrol:allowforsite", "sloodle");
@@ -97,7 +97,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('activeobjectlifetime', 'sloodle'); ?> <?php echo sloodle_helpbutton('object_authorization', get_string('activeobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('activeobjectlifetime', 'sloodle'); ?> <?php echo $OUTPUT->help_icon('activeobjects','sloodle'); ?></h3>
         <p>
          <?php
             print_string("activeobjectlifetime:info", "sloodle");
@@ -113,7 +113,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('userobjectlifetime', 'sloodle'); ?> <?php echo sloodle_helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('userobjectlifetime', 'sloodle'); ?> <?php echo $OUTPUT->help_icon('userobjects','sloodle'); ?></h3>
         <p>
          <?php
             print_string("userobjectlifetime:info", "sloodle");

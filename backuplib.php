@@ -155,7 +155,7 @@
     */
     function sloodle_check_backup_mods_instances($instance, $backup_unique_code) {
         // Add the course data
-        $info[$instance->id.'0'][0] = '<b>'.$instance->name.'</b>';
+        $info[$instance->id.'0'][0] = '<strong>'.$instance->name.'</strong>';
         $info[$instance->id.'0'][1] = '';
         
         // Now, if requested, the user_data

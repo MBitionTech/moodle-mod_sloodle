@@ -77,7 +77,8 @@ function sloodle_text_email($to, $subject, $messagetext)
         
     } else {
         mtrace('ERROR: '. $mail->ErrorInfo);
-        add_to_log(SITEID, 'library', 'mailer', $FULLME, 'ERROR: '. $mail->ErrorInfo);
+        //add_to_log(SITEID, 'library', 'mailer', $FULLME, 'ERROR: '. $mail->ErrorInfo);
+        sloodle_add_to_log(SITEID, 'mail_log', 'lib/mail.php', array(), 'ERROR: '. $mail->ErrorInfo);
         if (!empty($CFG->debugsmtp)) {
             echo '</pre>';
         }

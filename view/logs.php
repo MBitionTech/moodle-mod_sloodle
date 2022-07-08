@@ -36,12 +36,15 @@ class sloodle_view_logs extends sloodle_base_view
     * @access private
     */
     var $sloodle_course = null;
+
+
     /**
     * Constructor.
     */
-    function sloodle_view_logs()
+    function __construct()
     {
     }
+
 
     /**
     * Check the request parameters to see which course was specified.
@@ -49,10 +52,11 @@ class sloodle_view_logs extends sloodle_base_view
     function process_request()
     {
         $id = required_param('id', PARAM_INT);
-        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) print_error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
-        if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+        if (!$this->sloodle_course->load($this->course)) print_error(get_string('failedcourseload', 'sloodle'));
     }
+
 
     /**
     * Check that the user is logged-in and has permission to alter course settings.
@@ -61,13 +65,16 @@ class sloodle_view_logs extends sloodle_base_view
     {
         // Ensure the user logs in
         require_login($this->course->id);
-        if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
-        add_to_log($this->course->id, 'course', 'view sloodle data', '', "{$this->course->id}");
+        if (isguestuser()) print_error(get_string('noguestaccess', 'sloodle'));
+        //add_to_log($this->course->id, 'course', 'view sloodle data', '', "{$this->course->id}");
+        sloodle_add_to_log($this->course->id, 'module_viewed', 'view.php', array('_type'=>'logs','id'=>$this->course->id), 'logs: view sloodle data');
 
         // Ensure the user is allowed to update information on this course
-        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        //$this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        $this->course_context = context_course::instance($this->course->id, IGNORE_MISSING);
         require_capability('moodle/course:update', $this->course_context);
     }
+
 
     /**
     * Print the course settings page header.
@@ -76,7 +83,7 @@ class sloodle_view_logs extends sloodle_base_view
     {
         global $CFG;
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view_logs.php?id={$this->course->id}\">".get_string('logs:view', 'sloodle')."</a>";
-        sloodle_print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
+        sloodle_print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', false);
     }
 
 
@@ -86,57 +93,51 @@ class sloodle_view_logs extends sloodle_base_view
     */
     function render()
     {
-        
         global $CFG;
         global $sloodle;
         // Display info about Sloodle course configuration
         echo "<h1 style=\"text-align:center;\">".get_string('logs:sloodlelogs','sloodle')."</h1>\n";
-        
 
-      // sloodle_print_box(get_string('logs:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
+        //sloodle_print_box(get_string('logs:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
         $sloodletable = new stdClass(); 
-         $sloodletable->head = array(                         
+        $sloodletable->head = array(                         
              '<h4><div style="color:red;text-align:left;">'.get_string('avatarname', 'sloodle').'</h4>',
              '<h4><div style="color:red;text-align:left;">'.get_string('user').'</h4>',
              '<h4><div style="color:green;text-align:left;">'.get_string('action').'</h4>',             
              '<h4><div style="color:green;text-align:left;">'.get_string('logs:slurl', 'sloodle').'</h4>',
              '<h4><div style="color:black;text-align:center;">'.get_string('logs:time', 'sloodle').'</h4>');             
-              //set alignment of table cells                                        
-            $sloodletable->align = array('left','left','left','left','left');
-            $sloodletable->width="95%";
-            //set size of table cells
-            $sloodletable->size = array('15%','10%', '50%','5%','20%');
 
-         $logData = sloodle_get_records('sloodle_logs','course',$this->sloodle_course->get_course_id(), 'timemodified DESC');
+        //set alignment of table cells                                        
+        $sloodletable->align = array('left','left','left','left','left');
+        $sloodletable->width="95%";
+        //set size of table cells
+        $sloodletable->size = array('15%','10%', '50%','5%','20%');
+
+        $logData = sloodle_get_records('sloodle_logs','course',$this->sloodle_course->get_course_id(), 'timemodified DESC');
           
-        
         if ($logData && count($logData)>0){
-                foreach ($logData as $ld){
-                    $trowData= Array();        
-                         $link_url=' <a href="'.$CFG->wwwroot.'/user/view.php?id='.$ld->userid."&amp;course=";
-                         $link_url.=$this->sloodle_course->get_course_id().'">'.$ld->avname."</a>";
-                         $trowData[]=$link_url;    
-                         $userData = sloodle_get_record('user','id',$ld->userid);
-                         $username= $userData->firstname.' '.$userData->lastname;                         
-                         $trowData[]=$username;    
-                         $trowData[]=$ld->action;    
-                         $trowData[]='<a href="'.$ld->slurl.'">'.get_string('logs:slurl', 'sloodle').'</a>';    
-                         $trowData[]=date("F j, Y, g:i a",$ld->timemodified);             
-                         $sloodletable->data[] = $trowData;                     
-                }//for
-             
+            foreach ($logData as $ld){
+                $trowData= Array();        
+                $link_url=' <a href="'.$CFG->wwwroot.'/user/view.php?id='.$ld->userid."&amp;course=";
+                $link_url.=$this->sloodle_course->get_course_id().'">'.$ld->avname."</a>";
+                $trowData[]=$link_url;    
+                $userData = sloodle_get_record('user','id',$ld->userid);
+                $username= $userData->firstname.' '.$userData->lastname;                         
+                $trowData[]=$username;    
+                $trowData[]=$ld->action;    
+                $trowData[]='<a href="'.$ld->slurl.'">'.get_string('logs:slurl', 'sloodle').'</a>';    
+                $trowData[]=date("F j, Y, g:i a",$ld->timemodified);             
+                $sloodletable->data[] = $trowData;                     
             }
-            else
-            {
-                $trowData[]=get_string('logs:nologs', 'sloodle');
-                $sloodletable->data[] = $trowData;
-            }
+        }
+        else {
+            $trowData[]=get_string('logs:nologs', 'sloodle');
+            $sloodletable->data[] = $trowData;
+        }
         
         sloodle_print_table($sloodletable); 
-        
- 
- 
     }
+
 
     /**
     * Print the footer for this course.
@@ -150,5 +151,3 @@ class sloodle_view_logs extends sloodle_base_view
 
 }
 
-
-?>

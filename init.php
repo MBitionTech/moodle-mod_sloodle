@@ -22,7 +22,7 @@
 
     require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
     require_once (realpath(dirname(__FILE__) . "/" . "lib/compat.php"));
-    
+
     // Is this a linker script?
     if (defined('SLOODLE_LINKER_SCRIPT')) {
         // If the site is in maintenance mode, then stop the script
@@ -44,11 +44,15 @@
     /** The data path for the root of the Sloodle library folder. */
     define('SLOODLE_LIBROOT', $CFG->dirroot.'/mod/sloodle/lib');
     
+    require(realpath(dirname(__FILE__) . "/" . "version.php"));
     /** The Sloodle version number. */
-    define('SLOODLE_VERSION', 2.1); // This is the release version, not the module version (which is in version.php)
+    //define('SLOODLE_VERSION', 2.2); // This is the release version, not the module version (which is in version.php)
+    define('SLOODLE_VERSION', $plugin->release); // This is the release version, not the module version (which is in version.php)
 
-    // The following tells us whether Moodle is at > version 2  or not. 
-    define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2010060800) );
+    // The following tells us whether Moodle is at > version 2.6  or not. 
+    //define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2010060800) );
+    //define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2013111800) );
+    define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= $plugin->requires) );
 
 //---------------------------------------------------------------------
 
@@ -199,6 +203,8 @@
     require_once(SLOODLE_LIBROOT.'/general.php');
     /** Sloodle core library functionality */
     require_once(SLOODLE_DIRROOT.'/lib.php');
+    /** */
+    require_once(SLOODLE_DIRROOT.'/locallib.php');
     /** Request and response functionality. */
     require_once(SLOODLE_LIBROOT.'/io.php');
     /** User functionality. */
@@ -215,6 +221,4 @@
     require_once(SLOODLE_LIBROOT.'/object_configs.php');
     /** Active Objects and their definitions. */
     require_once(SLOODLE_LIBROOT.'/active_object.php');
-
-
-?>
+    //

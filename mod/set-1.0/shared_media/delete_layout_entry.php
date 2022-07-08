@@ -43,7 +43,8 @@ if (!$result) {
         error_output('Layout not found');
     }
 
-    $controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+    //$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+    $controller_context = context_module::instance($layout->controllerid);
     if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
             error_output( 'Access denied');
     }

@@ -104,16 +104,15 @@
             exit();
         }
         // make log entries
-        add_to_log($course->id, 'quiz', 'attempt',
-                       "review.php?attempt=$attempt->id",
-                       "$quiz->id", $cm->id);
+        //add_to_log($course->id, 'quiz', 'attempt', "review.php?attempt=$attempt->id", "$quiz->id", $cm->id);
+        sloodle_add_to_log($course->id, 'mod_log', 'mod/quiz-1.0/linker_moodle_2_0_down.php', array('attempt'=>$attempt->id), 'quiz_down: attempt');
 
     } else {
         // log continuation of attempt only if some time has lapsed
         if (($timestamp - $attempt->timemodified) > 600) { // 10 minutes have elapsed
-             add_to_log($course->id, 'quiz', 'continue attemp', // this action used to be called 'continue attempt' but the database field has only 15 characters
-                           "review.php?attempt=$attempt->id",
-                           "$quiz->id", $cm->id);
+			// this action used to be called 'continue attempt' but the database field has only 15 characters
+            //add_to_log($course->id, 'quiz', 'continue attemp', "review.php?attempt=$attempt->id", "$quiz->id", $cm->id);
+        	sloodle_add_to_log($course->id, 'mod_log', 'mod/quiz-1.0/linker_moodle_2_0_down.php', array('attempt'=>$attempt->id), 'quiz_down: continue attempt');
         }
     }
     if (!$attempt->timestart) { // shouldn't really happen, just for robustness
@@ -357,9 +356,8 @@ exit;
                             save_question_session($question, $closestates[$key]);
             }
         }
-        add_to_log($course->id, 'quiz', 'close attempt',
-                           "review.php?attempt=$attempt->id",
-                           "$quiz->id", $cm->id);
+        //add_to_log($course->id, 'quiz', 'close attempt', "review.php?attempt=$attempt->id", "$quiz->id", $cm->id);
+        sloodle_add_to_log($course->id, 'mod_log', 'mod/quiz-1.0/linker_moodle_2_0_down.php', array('attempt'=>$attempt->id), 'quiz_down: close attempt');
     }
 
 /// Update the quiz attempt and the overall grade for the quiz
@@ -406,7 +404,6 @@ exit;
         /// Print all the questions
         $number = quiz_first_questionnumber($attempt->layout, $pagelist);
         foreach ($pagequestions as $i) {
-
             $options = quiz_get_renderoptions($quiz->review, $states[$i]);
             // Print the question
             // var_dump($questions[$i]);
@@ -418,14 +415,9 @@ exit;
  
                 // Make sure the variables exist (avoids warnings!)
                 if (!isset($q->single)) $q->single = 0;
-                $shuffleanswers = 0;			
+                $shuffleanswers = 0;
                 if (isset($q->options->shuffleanswers) && $q->options->shuffleanswers) $shuffleanswers = 1;
-
-				$imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$q->options->id."/question/questiontext/".$attempt->id."/".$q ->id."/".$q ->id;
-				$imgUrl .=substr ( sloodle_extract_first_image_url($q->questiontext), 14);
-                
-				
-            	
+            
                 $output[] = array(
                     'question',
                     $localqnum, //$i, // The value in $i is equal to $q->id, rather than being sequential in the quiz
@@ -439,13 +431,8 @@ exit;
                     $q->maxgrade,
                     $q->single,
                     $shuffleanswers,
-                    0, //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
-                    $imgUrl
-					
-					
-					
+                    0 //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
                 );
-								
 
                 // Create an output array for our options (available answers) so that we can shuffle them later if necessary
                 $outputoptions = array();
@@ -455,10 +442,6 @@ exit;
                    
                    if (!is_array($op)) continue; // Ignore this if there are no options (Prevents nasty PHP notices!)
                    foreach($op as $ok=>$ov) {
-                   	$answer_imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$ov->id."/question/questiontext/".$attempt->id."/".$ov->question."/".$ov->question;
-					$answer_imgUrl .=substr ( sloodle_extract_first_image_url($ov->answer), 14);
-                	$feedback_imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$ov->id."/question/questiontext/".$attempt->id."/".$ov->question."/".$ov->question;
-					$feedback_imgUrl .=substr ( sloodle_extract_first_image_url($ov->feedback), 14);
                       $outputoptions[] = array(
                         'questionoption',
                         $i,
@@ -466,9 +449,7 @@ exit;
                         $ov->question,
                         sloodle_clean_for_output($ov->answer),
                         $ov->fraction,
-                        sloodle_clean_for_output($ov->feedback),
-                        $answer_imgUrl,
-                        $feedback_imgUrl
+                        sloodle_clean_for_output($ov->feedback)
                       );
                    }
                 }
@@ -482,7 +463,6 @@ exit;
             save_question_session($questions[$i], $states[$i]);
             $number += $questions[$i]->length;
         }
-
 
         $secondsleft = ($quiz->timeclose ? $quiz->timeclose : 999999999999) - time();
         //if ($isteacher) {

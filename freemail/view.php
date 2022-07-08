@@ -17,7 +17,8 @@ if (!defined('SLOODLE_FREEMAIL_ACTIVATE') || !SLOODLE_FREEMAIL_ACTIVATE) {
 }
 
 $PAGE->set_context(get_system_context());
-$PAGE->set_context(get_context_instance(CONTEXT_COURSE, SITEID));
+//$PAGE->set_context(get_context_instance(CONTEXT_COURSE, SITEID));
+$PAGE->set_context(context_course::instance(SITEID, IGNORE_MISSING));
 
 $PAGE->set_url('/mod/sloodle/freemail/view.php');
 $PAGE->set_title('Postcard Blogger');
@@ -26,8 +27,6 @@ $PAGE->set_heading('Postcard Blogger.');
 require_login();
 
 echo $OUTPUT->header();
-
-
 
 //$PAGE->set_context(context_system::instance());
 //$PAGE->set_pagelayout('standard');
@@ -52,8 +51,6 @@ if ( $freemail_cfg->sloodle_freemail_mail_box_settings == '' ) {
     $noticeTable->cellspacing=10; 
     $noticeTable->data[] = $r;  
     echo html_writer::table($noticeTable);
-
-
     echo $OUTPUT->footer();
     exit;
 }
@@ -61,7 +58,7 @@ if ( $freemail_cfg->sloodle_freemail_mail_box_settings == '' ) {
 $body = get_string('freemail:explanation_wheretosend','sloodle', '');
 $body .= '<br />';
 $body .= '<br />';
-$body .= '<b>'.htmlentities($freemail_cfg->sloodle_freemail_mail_email_address).'</b>';
+$body .= '<strong>'.htmlentities($freemail_cfg->sloodle_freemail_mail_email_address).'</strong>';
 $body .= '<br />';
 $body .= '<br />';
 $body .= get_string('freemail:explanation_howtoblog','sloodle');
@@ -96,10 +93,7 @@ echo get_string('freemail:delete_message', 'sloodle');
 
 <p><br /></p>
 <?php
-
-
 if (isset($_POST['do_test'])) {
-
     $verbose = true;
     $daemon = false;
 
@@ -112,18 +106,11 @@ if ($nodelete && $daemon) {
     exit;
 }
 
-
 echo $OUTPUT->footer();
 exit;
 
-
 //echo $OUTPUT->heading('SLOODLE Freemail - Postcard Blogger', 1);
 //exit;
-
-
-
-
-
 
 $PAGE->set_state(1);
 $PAGE->set_state(2);
@@ -132,5 +119,3 @@ echo $OUTPUT->footer();
 exit;
 
 //$OUTPUT->footer();
-
-?>

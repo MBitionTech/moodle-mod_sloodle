@@ -80,12 +80,14 @@ class sloodle_view_addavatar extends sloodle_base_view
     /**
     * Constructor.
     */
-    function sloodle_view_addavatar()
+    //function sloodle_view_addavatar()
+    function __construct()
     {
         // Setup a dummy SloodleSession and use its user object
         $dummysession = new SloodleSession(false);
         $this->user = $dummysession->user;
     }
+
 
     /**
     * Check the request parameters to see which course was specified.
@@ -94,7 +96,7 @@ class sloodle_view_addavatar extends sloodle_base_view
     {
         // Load the requested user
         $userid = required_param('user', PARAM_INT);
-        if (!$this->user->load_user($userid)) error('User not found.');
+        if (!$this->user->load_user($userid)) print_error('User not found.');
         // Look for any existing registered avatars
         $linked_avatar = $this->user->load_linked_avatar();
         if ($linked_avatar === true) $this->has_avatar = 1;
@@ -102,29 +104,31 @@ class sloodle_view_addavatar extends sloodle_base_view
         
         // Fetch the Moodle course data
         $courseid = optional_param('course', SITEID, PARAM_INT);
-        if (!$this->course = sloodle_get_record('course', 'id', $courseid)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $courseid)) print_error('Could not find course.');
 
-	// Moodle 2 rendering functions like to know the course.
-	// They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
-	if ($this->course) {
-		global $PAGE;
-		if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
-			$PAGE->set_course($this->course);
-		}
-	}
+        // Moodle 2 rendering functions like to know the course.
+        // They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
+        if ($this->course) {
+            global $PAGE;
+            if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
+                $PAGE->set_course($this->course);
+            }
+        }
     }
+
 
     /**
     * Check that the user is logged-in and has permission to alter course settings.
     */
     function check_permission()
     {
-	$system_context = get_context_instance(CONTEXT_SYSTEM);
- 	
+        $system_context = get_context_instance(CONTEXT_SYSTEM);
+        
         // Only allow admins to do this.
         if (!has_capability('moodle/user:editprofile', $system_context)) print_error('Only site administrators have access to this page.');
     }
     
+
     /**
     * Process any form data which has been submitted.
     * This must be overridden to add functionality.
@@ -136,8 +140,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         
         // Make sure the correct session key was specified.
         $form_sesskey = required_param('sesskey', PARAM_RAW);
-        if ($form_sesskey != sesskey())
-        {
+        if ($form_sesskey != sesskey()) {
             $this->msg_error[] = get_string('invalidsesskey', 'sloodle');
             $this->add_status = -1;
             return;
@@ -148,23 +151,23 @@ class sloodle_view_addavatar extends sloodle_base_view
         $form_avname = required_param('sloodleavname', PARAM_TEXT);
         
         // Make sure the given UUID doesn't already exist in the database
-        if (sloodle_count_records('sloodle_users', 'uuid', $form_uuid))
-        {
+        if (sloodle_count_records('sloodle_users', 'uuid', $form_uuid)) {
             $this->msg_error[] = get_string('avataruuidalreadyindb', 'sloodle');
             $this->add_status = -1;
             return;
         }
         
         // Register the avatar to the user
-        if ($this->user->add_linked_avatar($this->user->get_user_id(), $form_uuid, $form_avname))
-        {
+        if ($this->user->add_linked_avatar($this->user->get_user_id(), $form_uuid, $form_avname)) {
             $this->msg_info[] = get_string('addavatar:success', 'sloodle');
             $this->add_status = 1;
-        } else {
+        }
+        else {
             $this->msg_info[] = get_string('addavatar:fail', 'sloodle');
             $this->add_status = -1;
         }
     }
+
 
     /**
     * Print the course settings page header.
@@ -176,6 +179,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         // Construct the breadcrumb links
         $userid = $this->user->get_user_id();
         $navigation = "";
+
         if ($this->course->id != SITEID) $navigation .= "<a href=\"{$CFG->wwwroot}/course/view.php?_type=user&amp;id={$this->course->id}\">{$this->course->shortname}</a> -> ";
         $navigation .= "<a href=\"".SLOODLE_WWWROOT."/view.php?_type=users&amp;course={$this->course->id}\">".get_string('sloodleuserprofiles', 'sloodle') . '</a> -> ';
         $navigation .= "<a href=\"".SLOODLE_WWWROOT."/view.php?_type=user&amp;id={$userid}&amp;course={$this->course->id}\">".$this->user->get_user_firstname()." ".$this->user->get_user_lastname()."</a> -> ";
@@ -200,15 +204,12 @@ class sloodle_view_addavatar extends sloodle_base_view
         $strsubmit = get_string('submit', 'sloodle');
         $struser = get_string('user', 'sloodle');
 
-    //------------------------------------------------------    
-        
+        //------------------------------------------------------    
         // Display any information messages
-        if (count($this->msg_info) > 0)
-        {
+        if (count($this->msg_info) > 0) {
             sloodle_print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
             echo "<ul style=\"list-style:none;\">\n";
-            foreach ($this->msg_info as $msg)
-            {
+            foreach ($this->msg_info as $msg) {
                 echo "<li><img src=\"{$CFG->wwwroot}/pix/i/tick_green_big.gif\" alt=\"[tick icon]\" /> <strong>{$msg}</strong></li>\n";
             }
             echo "</ul>\n";
@@ -216,12 +217,10 @@ class sloodle_view_addavatar extends sloodle_base_view
         }
         
         // Display any error messages
-        if (count($this->msg_error) > 0)
-        {
+        if (count($this->msg_error) > 0) {
             sloodle_print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
             echo "<ul style=\"list-style:none;\">\n";
-            foreach ($this->msg_error as $msg)
-            {
+            foreach ($this->msg_error as $msg) {
                 echo "<li><img src=\"{$CFG->wwwroot}/pix/i/cross_red_big.gif\" alt=\"[error icon]\" /> {$msg}</li>\n";
             }
             echo "</ul>\n";
@@ -231,12 +230,10 @@ class sloodle_view_addavatar extends sloodle_base_view
         // Prepare the form default values
         $form_default_avname = '';
         $form_default_uuid = '';
-        if ($this->add_status == -1)
-        {
+        if ($this->add_status == -1) {
             $form_default_avname = optional_param('sloodleavname', '', PARAM_TEXT);
             $form_default_uuid = optional_param('sloodleuuid', '', PARAM_TEXT);
         }
-        
         
         // Display the form
         $sk = sesskey();
@@ -247,37 +244,29 @@ class sloodle_view_addavatar extends sloodle_base_view
         echo "<h2>",get_string('addavatar', 'sloodle'),"</h2>\n";
         
         echo <<<ADD_AVATAR_FORM
-        
 <form action="{$CFG->wwwroot}/mod/sloodle/view.php" method="GET">
- 
- <fieldset> 
-
-  <input type="hidden" name="_type" value="addavatar"/>
-  <input type="hidden" name="user" value="{$userid}"/>
-  <input type="hidden" name="course" value="{$this->course->id}"/>
-  <input type="hidden" name="sesskey" value="{$sk}"/>
-  
-  {$struser}: <strong>{$userfullname}</strong><br/><br/>
- 
-  <label for="sloodleavname">{$stravatarname}: </label>
-  <input type="text" name="sloodleavname" id="sloodleavname" value="{$form_default_avname}" size="45" /><br/><br/>
- 
-  <label for="sloodleuuid">{$stravataruuid}: </label>
-  <input type="text" name="sloodleuuid" id="sloodleuuid" value="{$form_default_uuid}" size="45" /><br/><br/>
- 
-  <input type="submit" name="submit" value="{$strsubmit}" />
-
- </fieldset>
+  <fieldset> 
+    <input type="hidden" name="_type" value="addavatar"/>
+    <input type="hidden" name="user" value="{$userid}"/>
+    <input type="hidden" name="course" value="{$this->course->id}"/>
+    <input type="hidden" name="sesskey" value="{$sk}"/>
+    {$struser}: <strong>{$userfullname}</strong><br /><br />
+    <label for="sloodleavname">{$stravatarname}: </label>
+    <input type="text" name="sloodleavname" id="sloodleavname" value="{$form_default_avname}" size="45" /><br /><br />
+    <label for="sloodleuuid">{$stravataruuid}: </label>
+    <input type="text" name="sloodleuuid" id="sloodleuuid" value="{$form_default_uuid}" size="45" /><br /><br />
+    <input type="submit" name="submit" value="{$strsubmit}" />
+  </fieldset>
 </form>
 ADD_AVATAR_FORM;
         
         sloodle_print_box_end();
         
-        
         echo "<div style=\"text-align:center;\">\n";
         echo "<a href=\"".SLOODLE_WWWROOT."/view.php?_type=user&amp;id={$userid}&amp;course={$this->course->id}\">&lt;&lt;&lt; ".get_string('backtoavatarpage','sloodle')."</a>";
         echo "</div>\n";
     }
+
 
     /**
     * Print the footer for this course.
@@ -286,8 +275,5 @@ ADD_AVATAR_FORM;
     {
         sloodle_print_footer($this->course);
     }
-
 }
 
-
-?>

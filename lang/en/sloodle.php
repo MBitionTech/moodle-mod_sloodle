@@ -6,6 +6,8 @@
 * @package sloodlelang
 */
 
+$help_path = realpath(dirname(__FILE__)).'/help/sloodle';
+
 $string['pluginname']   = 'SLOODLE';
 $string['pluginadministration']   = 'SLOODLE Administration';
 
@@ -28,6 +30,7 @@ $string['accesslevelserver:desc'] = 'This determines who may use the server reso
 
 $string['actions'] = 'Actions';
 $string['activeobjects'] = 'Active objects';
+$string['activeobjects_help'] = file_get_contents($help_path.'/object_authorization.html');
 $string['activeobjectlifetime'] = 'Active object lifetime (days)';
 $string['activeobjectlifetime:info'] = 'The number of days before which an active object will expire if not used.';
 $string['addavatar'] = 'Add an avatar';
@@ -79,7 +82,7 @@ $string['cfgnotecard:security'] = 'For security reasons, you should make sure th
 $string['cfgnotecard:setnote'] = 'Note: if you configure a SLOODLE Set, then it will automatically configure any other objects it creates (although you can still manually configure them if you want to).';
 
 $string['changecourse'] = 'Change Course';
-$string['choosecourse'] = 'Choose the course you want to use in Second Life.';
+$string['choosecourse'] = 'Choose the course you want to use in Second Life/OpenSim.';
 $string['clickchangeit'] = 'Click here to change it';
 $string['clickhere'] = 'click here';
 $string['clicktodeleteentry'] = 'Click here to delete this entry.';
@@ -98,9 +101,9 @@ $string['confirmdelete'] = 'Are you sure?';
 $string['confirmdeleteuserobjects'] = 'Are you sure you want to delete all these user objects?';
 $string['controlaccess'] = 'You can control access to your courses by enabling or disabling the SLOODLE Controller';
 
-//$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between Second Life and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
+//$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between Second Life/OpenSim and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
 
-$string['controllerinfo'] = 'This course is linked to learning activities in Second Life. This page is provided to allow students to check whether the Second Life interface is currently enabled, and for instructors to configure the interface.';
+$string['controllerinfo'] = 'This course is linked to learning activities in Second Life/OpenSim. This page is provided to allow students to check whether the Second Life/OpenSim interface is currently enabled, and for instructors to configure the interface.';
 $string['moduletype_controller_help'] = 'The controller links a Moodle course to a set of activities in a virtual world.';
 $string['moduletype_controller'] = 'Controlller';
 
@@ -110,8 +113,11 @@ $string['moduletype_presenter'] = 'Presenter';
 $string['moduletype_distributor_help'] = 'The distributor allows you to put virtual inventory in an object in a virtual world and distribute it to your students.';
 $string['moduletype_distributor'] = 'Distributor';
 
+$string['moduletype_tracker_help'] = '';
+$string['moduletype_tracker'] = 'Tracker';
+
 $string['courseconfig'] = 'SLOODLE Course Configuration';
-$string['courseconfig:info'] = 'On this page, you can configure the SLOODLE settings which affect your entire course. However, some of the settings may be disabled on your Moodle site by an administrator.<br/><br/><b>Please note:</b> auto-registration and auto-enrolment are not suitable for all Moodle installations. Please read the documentation about each one before enabling them.';
+$string['courseconfig:info'] = 'On this page, you can configure the SLOODLE settings which affect your entire course. However, some of the settings may be disabled on your Moodle site by an administrator.<br /><br /><strong>Please note:</strong> auto-registration and auto-enrolment are not suitable for all Moodle installations. Please read the documentation about each one before enabling them.';
 $string['coursesettings'] = 'Course Settings';
 $string['createnotecard'] = 'Create notecard';
 
@@ -161,9 +167,11 @@ $string['help:primpassword'] = 'What is the Prim Password for?';
 $string['primpass_help'] = 'What is the Prim Password for?';
 $string['help:userediting'] = 'What is the risk?';
 $string['help:autoreg'] = 'What is auto-registration?';
+$string['help:autoreg_help'] = file_get_contents($help_path.'/auto_registration.html');
 $string['auto_registration_help'] = 'Turning this on will allow a Moodle account to be created automatically for avatars who use your SLOODLE objects in-world. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-registration won\'t work.';
 $string['auto_registration'] = 'Auto-registration?';
 $string['help:autoenrol'] = 'What is auto-enrolment?';
+$string['help:autoenrol_help'] = file_get_contents($help_path.'/auto_enrolment.html');
 $string['auto_enrolment_help'] = 'Turning this on will make Moodle try to enrol people who use your SLOODLE objects in-world automatically on the relevant course. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-enrolment won\'t work.';
 
 
@@ -174,6 +182,7 @@ $string['user_objects_help'] = 'The number of days before which a user-centric o
 $string['user_objects'] = 'User-authorized objects';
 
 $string['help:versionnumbers'] = 'What do these numbers mean?';
+$string['help:versionnumbers_help'] = file_get_contents($help_path.'/version_numbers.html');
 $string['help:multipleentries'] = 'Why are there multiple entries? What does it mean?';
 $string['hour'] = 'hour';
 $string['hours'] = 'hours';
@@ -219,7 +228,7 @@ $string['moduletype'] = 'Module Type';
 $string['moduletype:controller'] = 'Controller';
 $string['moduletype:distributor'] = 'Distributor';
 $string['moduletype:presenter'] = 'Presenter';
-$string['moduletype:map'] = 'Second Life Map';
+$string['moduletype:map'] = 'Second Life/OpenSim Map';
 $string['moduletype:tracker'] = 'Tracker';
 
 
@@ -263,7 +272,7 @@ $string['nochoices'] = 'There are no choices available in this course.';
 $string['noquizzes'] = 'There are no quizzes available in this course.';
 $string['noglossaries'] = 'There are no glossaries available in this course.';
 $string['nodistributors'] = 'There are no distributors available in this course.';
-$string['nosloodleassignments'] = 'There are no SLOODLE-compatible assignments available in this course.';
+$string['nosloodleassigns'] = 'There are no SLOODLE-compatible assigns available in this course.';
 $string['nopresenters'] = 'There are no SLOODLE Presenters available in this course.';
 $string['notrackers'] = 'There are no SLOODLE Tracker activities in this course.';
 
@@ -293,8 +302,8 @@ $string['object:moodlescreen'] = 'Moodle Screen';
 $string['object:tracker'] = 'Tracker';
 
 $string['objectgroup:registration'] = 'Registration and Enrolment';
-$string['objectgroup:communication'] = 'Communication, Assignments and Inventory';
-//$string['objectgroup:inventory'] = 'Inventory and Assignments';
+$string['objectgroup:communication'] = 'Communication, Assigns and Inventory';
+//$string['objectgroup:inventory'] = 'Inventory and Assigns';
 $string['objectgroup:activity'] = 'Quizzes and Activities';
 $string['objectgroup:misc'] = 'Other';
 
@@ -326,7 +335,7 @@ $string['of'] = 'of';
 $string['or'] = 'or';
 
 $string['pagecount'] = 'Page {$a->num} of {$a->total}';
-$string['postedfromsl'] = 'Posted from Second Life';
+$string['postedfromsl'] = 'Posted from Second Life/OpenSim';
 $string['pendingavatarnotfound'] = 'Could not locate a pending entry for your avatar. Perhaps you are already registered?';
 $string['pendingallocations'] = 'Pending Allocations';
 $string['pendingavatars'] = 'Pending Avatars';
@@ -365,6 +374,9 @@ $string['presenter:sloodleinsert'] = 'Insert at position:';
 $string['presenter:type:image'] = 'Image';
 $string['presenter:type:video'] = 'Video';
 $string['presenter:type:web'] = 'Web';
+$string['presenter:insertto'] = "Insert to";
+$string['presenter:uploadmultifile'] = "Upload files";
+$string['presenter:uploadmultifile_help'] = "You can upload multi files. Supported formats are jpg, gif, png, mov and mpg.";
 $string['presenter:uploadInstructions'] = "To Bulk Upload, first click the button below, then to select multiple files, hold down the control or shift key while selecting files";
 $string['presenter:importslides'] = 'Import Slides';
 $string['presenter:importslidescaption'] = 'Import slides from a file or other source';
@@ -418,7 +430,7 @@ $string['selectchatroom'] = 'Select Chatroom';
 $string['selectchoice'] = 'Select Choice';
 $string['selectglossary'] = 'Select Glossary';
 $string['selectdistributor'] = 'Select Distributor';
-$string['selectassignment'] = 'Select Assignment';
+$string['selectassign'] = 'Select Assign';
 $string['selectquiz'] = 'Select Quiz';
 $string['selectobject'] = 'Select Object';
 $string['selectuser'] = 'Select User';
@@ -483,6 +495,7 @@ $string['userlinkfailed'] = 'There was an error while trying to link your avatar
 $string['userlinksuccessful'] = 'Your avatar was successfully linked to your Moodle account. All SLOODLE objects linked to this site should now recognised you automatically.';
 $string['usersearch'] = 'User search (within course)';
 $string['userobjects'] = 'User Objects';
+$string['userobjects_help'] = file_get_contents($help_path.'/user_objects.html');
 $string['userobjectlifetime'] = 'User object lifetime (days)';
 $string['userobjectlifetime:info'] = 'The number of days before which a user-centric object (such as the Toolbar) will expire if not used.';
 $string['userobjectauth'] = 'SLOODLE User Object Authorization';
@@ -511,35 +524,36 @@ $string['welcometosloodle'] = 'Welcome to SLOODLE';
 $string['week'] = 'week';
 $string['weeks'] = 'weeks';
 
-$string['xmlrpc:unexpectedresponse'] = 'Not getting the expected XMLRPC response. Is Second Life broken again?';
+$string['xmlrpc:unexpectedresponse'] = 'Not getting the expected XMLRPC response. Is Second Life/OpenSim broken again?';
 $string['xmlrpc:error'] = 'XMLRPC Error';
 $string['xmlrpc:channel'] = 'XMLRPC Channel';
 
 $string['year'] = 'year';
 $string['years'] = 'years';
 $string['Yes'] = 'Yes';
-$string ['awards:scoreboardtitle']= 'Title';                      
-$string ['awards:viewgradesassociated']= 'Click here to view the grades associated with this SLOODLE Award';                      
-$string ['awards:stipendisfor']= 'Total Allocations:';
-$string ['awards:nostudents']= 'No Students Registered';
-$string ['awards:purpose']= 'It\'s purpose is: ';
-$string ['awards:nostipendsgiven'] = 'No stipends have been taken by anyone yet!';   
-$string ['awards:description'] = 'Description';
-$string ['awards:transactions'] = 'Transactions & Allocated Stipends';   
-$string ['awards:noavatar'] = 'No Avatar Registered'; 
-$string ['awards:avname'] = 'Avatar Name'; 
-$string ['awards:alloted'] = 'Allotted'; 
-$string ['awards:withdrawn'] = 'Withdrawn'; 
-$string ['awards:selectaward'] ="Please select the SLOODLE Award System this object connects to";
-$string ['awards:nostpendgivers'] = 'No stipend givers have been added to your moodle course.  Please add a stipend giver activity first.';
-$string ['awards:date'] = 'Date';
-$string ['awards:teachers'] = 'Teachers';
-$string ['awards:administrators'] = 'Administrators';
 
-$string ['awards:students'] = 'Students';
-$string ['awards:noavatarbutalreadywithdrew'] = 'Avatar no longer listed. But debit transaction exists';
-$string ['awards:create'] = 'Add Stipends now!'; 
-$string ['awards:setup'] = 'Click here to create allocate your stipend!';    
+$string['awards:scoreboardtitle']= 'Title';                      
+$string['awards:viewgradesassociated']= 'Click here to view the grades associated with this SLOODLE Award';                      
+$string['awards:stipendisfor']= 'Total Allocations:';
+$string['awards:nostudents']= 'No Students Registered';
+$string['awards:purpose']= 'It\'s purpose is: ';
+$string['awards:nostipendsgiven'] = 'No stipends have been taken by anyone yet!';   
+$string['awards:description'] = 'Description';
+$string['awards:transactions'] = 'Transactions & Allocated Stipends';   
+$string['awards:noavatar'] = 'No Avatar Registered'; 
+$string['awards:avname'] = 'Avatar Name'; 
+$string['awards:alloted'] = 'Allotted'; 
+$string['awards:withdrawn'] = 'Withdrawn'; 
+$string['awards:selectaward'] ="Please select the SLOODLE Award System this object connects to";
+$string['awards:nostpendgivers'] = 'No stipend givers have been added to your moodle course.  Please add a stipend giver activity first.';
+$string['awards:date'] = 'Date';
+$string['awards:teachers'] = 'Teachers';
+$string['awards:administrators'] = 'Administrators';
+
+$string['awards:students'] = 'Students';
+$string['awards:noavatarbutalreadywithdrew'] = 'Avatar no longer listed. But debit transaction exists';
+$string['awards:create'] = 'Add Stipends now!'; 
+$string['awards:setup'] = 'Click here to create allocate your stipend!';    
 $string['awards:admins']='Administrators';
 $string['awards:students']='Students';
 $string['awards:teachers']='Teachers';
@@ -548,7 +562,6 @@ $string['awards:credits']='Credits';
 $string['awards:debits']='Debits';
 $string['awards:debits']='Debits';
 $string['awards:avatars']='Avatars';
-$string['awards:username']='First/Last name';
 $string['awards:update']='Update';  
 $string['awards:cantupdate']='Error Can\'t update transaction record';
 $string['awards:successfullupdate']='Updated the following users: ';
@@ -601,24 +614,25 @@ $string['awards:interactwithobjectrequires']='To use object users must have:';
 $string['awards:notenoughmessage']='Insufficient currency message';
 
 $string['awards:help:icurrency']='If you select Lindens, then your students can withdraw money using a stipend giver. On the otherhand, iPoints are non monetary points you can award your students!'; 
-$string['help:maxpoints']='-->If you choose 1000 as the maximum points then students must accumulate 1000 points or higher in Second Life to acheive 100 percent grade  If however they only get 300 points in Second Life and the maximum points are set to 1000, then the grade achieved would be 300/1000  (30 percent)';                                    
+$string['help:maxpoints']='-->If you choose 1000 as the maximum points then students must accumulate 1000 points or higher in Second Life/OpenSim to acheive 100 percent grade  If however they only get 300 points in Second Life/OpenSim and the maximum points are set to 1000, then the grade achieved would be 300/1000  (30 percent)';                                    
 $string['awards:balanceUpdate']='Update';                   
 $string['awards:noneregistered']='No avatars registered in SLOODLE';  
 $string['awards:alreadywd2']=' You can not choose a lower allotment unless that user\'s avatar pays the stipend giver to credit their account'; 
-$string ['secondlifetracker:noavatar'] = 'No avatar registered yet'; 
-$string ['secondlifetracker:activity'] = 'ACTIVITY IN SECOND LIFE';
 
-$string ['secondlifetracker:noavatar'] = 'No avatar registered yet';
-$string ['secondlifetracker:nousers'] = 'No users registered yet';
-$string ['secondlifetasks'] = 'Assignment';
-$string ['secondlifeobjdesc'] = 'Task Description';
-$string ['secondlifelevelcompl'] = 'Level of Completion';
-$string ['secondlifetracker:completed'] = 'Completed';
-$string ['secondlifetracker:notcompleted'] = 'Not Completed';
-$string ['secondlifetracker:time'] = 'Time';
-$string ['secondlifetracker:selecttracker'] = 'Select Tracker';
-$string ['secondlifetracker:notrackers'] = 'No trackers in your course';
-$string ['tracker:requiredtasknotcompleted'] = 'You need to complete another task before you can use this object.';
+$string['tracker:tasks'] = 'Assign';
+$string['tracker:objdesc'] = 'Task Description';
+$string['tracker:levelcompl'] = 'Level of Completion';
+$string['tracker:noavatar'] = 'No avatar registered yet'; 
+$string['tracker:activity'] = 'ACTIVITY IN SECOND LIFE / OPENSIM';
+$string['tracker:noavatar'] = 'No avatar registered yet';
+$string['tracker:nousers'] = 'No users registered yet';
+$string['tracker:completerate'] = 'Completed';
+$string['tracker:completed'] = 'Completed';
+$string['tracker:notcompleted'] = 'Not Completed';
+$string['tracker:time'] = 'Time';
+$string['tracker:selecttracker'] = 'Select Tracker';
+$string['tracker:notrackers'] = 'No trackers in your course';
+$string['tracker:requiredtasknotcompleted'] = 'You need to complete another task before you can use this object.';
 
 $string['layoutpage'] = 'Layouts';
 $string['layoutmanager:nopermission'] = 'You do not have permission to edit layouts';
@@ -638,9 +652,9 @@ $string['layoutmanager:savelayout'] = 'Save Layout';
 $string['layoutmanager:currentobjects'] = 'Objects Already In Your Layout';
 $string['layoutmanager:addobjects'] = 'Add Objects To Your Layout';
 $string['awards:othersettings'] = 'Other Settings';
-$string['awards:assignment'] = 'Attach earned points to an assignment';
-$string['awards:refresh'] = 'This is the time in seconds that the awards will refresh the display in Second Life<br>';
-$string['awards:selectassignment'] = 'Assignment';
+$string['awards:assign'] = 'Attach earned points to an assign';
+$string['awards:refresh'] = 'This is the time in seconds that the awards will refresh the display in Second Life/OpenSim<br />';
+$string['awards:selectassign'] = 'Assign';
 $string['awards:teams'] = 'Teams';
 $string['awards:teamview'] = 'Team View';
 $string['awards:usertab'] = 'Users';
@@ -650,7 +664,8 @@ $string['awards:gamesview'] = 'Games List View';
 $string['awards:prizes'] = 'Prizes';  
 $string['awards:createteambtn'] = 'Create Team';   
 $string['awards:teamname'] = 'Team Name';  
-$string['awards'] = 'Points'; 
+$string['awards:award'] = 'Award'; 
+$string['awards:total'] = 'Total Points'; 
 $string['awards:gamenumber'] = 'Game #:';   
 $string['awards:gobacktogame'] = 'Go back to Game Scores';   
 $string['awards:noplayers'] = 'No Players have played this game yet.';   
@@ -666,7 +681,6 @@ $string['awards:existingteams'] = 'Players';
 $string['awards:availteams'] = 'Non Players'; 
 $string['awards:nogames'] = 'No games have been created yet for this scoreboard'; 
 $string['awards:createnewteam'] = 'Create new team'; 
-$string['awards:date'] = 'Date'; 
 $string['awards:gamename'] = 'Game Name'; 
 $string['awards:1st'] = '1st Place'; 
 $string['awards:2nd'] = '2nd Place'; 
@@ -741,6 +755,7 @@ $string['currency:currencies'] = 'Currencies';
 
 $string['awards:lastname'] = 'Last Name';
 $string['awards:firstname'] = 'First Name';
+$string['awards:username'] = 'User Name';
 $string['backpacks:backpacks'] = 'Backpacks';
 $string['currencies:displayorder'] = 'Order';
 $string['currencies:imageurl'] = 'Image Url';
@@ -749,7 +764,6 @@ $string['currency:add points'] = 'Add Points';
 $string['currency:checkall'] = 'Select All';
 $string['currency:addcurrency'] = 'Add Currency';
 $string['currency:viewcurrencies'] = 'View Currencies';
-$string['awards:username'] = 'User Name';
 $string['backpacks:backpackversion'] = 'Version:';
 $string['backpacks:sloodle version'] = 'SLOODLE Version:';
 $string['backpacks:nameunknown'] = 'Unknown';
@@ -854,5 +868,27 @@ $string['freemail:sloodleblogaddress'] = 'Address to send snapshots to';
 
 $string['ustreamchannel'] = 'UStream Channel';
 
+//
+$string['use_new_filemanager'] = 'Use New File Manager: ';
+$string['use_new_filemanager_desc'] = 'Use new upload interface for multi files.';
+$string['opensim_money_func'] = 'OpenSim DTL/NSL Money Server ';
+$string['opensim_money_func_desc'] = 'Do you use OpenSim DTL/NSL Money Server? ';
+$string['helper_script_dir'] = 'OpenSim Helper Scrupts Directory ';
+$string['helper_script_dir_desc'] = 'If you use OpenSim DTL/NSL Money Server with Helper Scripts, specifiy the scripts directory.';
 
+//
+$string['to_backpack'] = 'To backpacks';
+$string['to_grade'] = 'To grades';
+$string['to_money'] = 'To money of OS';
+$string['update_backpack'] = 'Update backpacks';
+
+$string['date_format'] = 'F j, Y, g:i:s a';
+
+$string['tracker:autosend'] = 'Auto send awards to backpack';
+$string['tracker:autosend_desc'] = 'Do you want to send awards of tracker to Backpack automatically?';
+$string['tracker:currency'] = 'Currency';
+$string['tracker:currency_help'] = 'Specify the currency, when you would like to send awards to Backpack automatically.';
+
+$string['backpack:explaine_money_display'] = '( ) indicats transfered  points that were sent as money to OpenSim';
+$string['backpack:magnification'] = 'magnification';
 

@@ -1,0 +1,8 @@
+name         UnnamedTask
+description  -
+
+order        0         // Does the task have to be done in a specific order? 0 -> NO, 1 -> YES
+position     0         // Position of the task in the pre-defined sequence
+total        0         // Number of tasks in the assignment
+
+award        1         // Award of this tracker

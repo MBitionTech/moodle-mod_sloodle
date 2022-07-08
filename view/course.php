@@ -12,6 +12,7 @@
 *
 */ 
 
+
 /** The base view class */
 require_once(SLOODLE_DIRROOT.'/view/base/base_view.php');
 /** SLOODLE course data structure */
@@ -48,9 +49,11 @@ class sloodle_view_course extends sloodle_base_view
     /**
     * Constructor.
     */
-    function sloodle_view_course()
+    //function sloodle_view_course()
+    function __construct()
     {
     }
+
 
     /**
     * Check the request parameters to see which course was specified.
@@ -58,11 +61,11 @@ class sloodle_view_course extends sloodle_base_view
     function process_request()
     {
         $id = required_param('id', PARAM_INT);
-        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) print_error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
-        if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
-
+        if (!$this->sloodle_course->load($this->course)) print_error(get_string('failedcourseload', 'sloodle'));
     }
+
 
     /**
     * Check that the user is logged-in and has permission to alter course settings.
@@ -71,13 +74,16 @@ class sloodle_view_course extends sloodle_base_view
     {
         // Ensure the user logs in
         require_login($this->course->id);
-        if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
-        add_to_log($this->course->id, 'course', 'view sloodle data', '', "{$this->course->id}");
+        if (isguestuser()) print_error(get_string('noguestaccess', 'sloodle'));
+        //add_to_log($this->course->id, 'course', 'view sloodle data', '', "{$this->course->id}");
+        sloodle_add_to_log($this->course->id, 'module_viewed', 'view.php', array('_type'=>'course','id'=>$this->course->id), 'course: view sloodle data');
 
         // Ensure the user is allowed to update information on this course
-        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        //$this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        $this->course_context =context_course::instance($this->course->id, IGNORE_MISSING); 
         require_capability('moodle/course:update', $this->course_context);
     }
+
 
     /**
     * Print the course settings page header.
@@ -87,8 +93,7 @@ class sloodle_view_course extends sloodle_base_view
         global $CFG;
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=course&id={$this->course->id}\">".get_string('courseconfig', 'sloodle')."</a>";
 
-
-        sloodle_print_header_simple(get_string('courseconfig','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
+        sloodle_print_header_simple(get_string('courseconfig','sloodle'), "&nbsp;", $navigation, "", "", true, '', false);
     }
 
 
@@ -98,7 +103,7 @@ class sloodle_view_course extends sloodle_base_view
     */
     function render()
     {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         // Fetch string table text
         $strsloodle = get_string('modulename', 'sloodle');
@@ -110,8 +115,7 @@ class sloodle_view_course extends sloodle_base_view
         $strdisabled = get_string('disabled','sloodle');
         $strsubmit = get_string('submit', 'sloodle');
 
-    //------------------------------------------------------    
-        
+        //------------------------------------------------------    
         // If the form has been submitted, then process the input
         if (isset($_REQUEST['submit_course_options'])) {
             // Get the parameters
@@ -128,22 +132,21 @@ class sloodle_view_course extends sloodle_base_view
             if ($this->sloodle_course->write()) {
                 redirect("view.php?_type=course&id={$this->course->id}", get_string('changessaved'), 4);
                 exit();
-            } else {
+            }
+            else {
                 sloodle_print_box(get_string('error'), 'generalbox boxwidthnarrow boxaligncenter');
             }
         }
         
-    //------------------------------------------------------
-
+        //------------------------------------------------------
         // Display info about Sloodle course configuration
         echo "<h1 style=\"text-align:center;\">".get_string('courseconfig','sloodle')."</h1>\n"; 
         echo "<h2 style=\"text-align:center;\">(".get_string('course').": \"<a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">".$this->sloodle_course->get_full_name()."</a>\")</h2>";
         
-
         sloodle_print_box(get_string('courseconfig:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
-        echo "<br/>\n";
+        echo "<br />\n";
 
-    // Get the initial form values
+        // Get the initial form values
         $val_autoreg = (int)(($this->sloodle_course->get_autoreg()) ? 1 : 0);
         $val_autoenrol = (int)(($this->sloodle_course->get_autoenrol()) ? 1 : 0);
         
@@ -159,24 +162,26 @@ class sloodle_view_course extends sloodle_base_view
         echo "<input type=\"hidden\" name=\"id\" value=\"{$this->course->id}\">\n";
         echo "<input type=\"hidden\" name=\"_type\" value=\"course\">\n";
         
-    // AUTO REGISTRATION //
+        // AUTO REGISTRATION //
         echo "<p>\n";
-        sloodle_helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', false);
+        echo $OUTPUT->help_icon('help:autoreg','sloodle');
         echo get_string('autoreg', 'sloodle').': ';
-        choose_from_menu($selection_menu, 'autoreg', $val_autoreg, '', '', 0, false);
+        //choose_from_menu($selection_menu, 'autoreg', $val_autoreg, '', '', 0, false);
+        echo html_writer::select($selection_menu, 'autoreg', $val_autoreg, array());
+
         // Add the site status
-        if (!sloodle_autoreg_enabled_site()) echo '<br/>&nbsp;<span style="color:red; font-style:italic; font-size:80%;">('.get_string('autoreg:disabled','sloodle').')</span>';
+        if (!sloodle_autoreg_enabled_site()) echo '<br />&nbsp;<span style="color:red; font-style:italic; font-size:80%;">('.get_string('autoreg:disabled','sloodle').')</span>';
         echo "</p>\n";
         
-    // AUTO ENROLMENT //
+        // AUTO ENROLMENT //
         echo "<p>\n";
-        sloodle_helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', false);
+        echo $OUTPUT->help_icon('help:autoenrol','sloodle');
         echo get_string('autoenrol', 'sloodle').': ';
-        choose_from_menu($selection_menu, 'autoenrol', $val_autoenrol, '', '', 0, false);
+        //choose_from_menu($selection_menu, 'autoenrol', $val_autoenrol, '', '', 0, false);
+        echo html_writer::select($selection_menu, 'autoenrol', $val_autoenrol, array());
         // Add the site status
-        if (!sloodle_autoenrol_enabled_site()) echo '<br/>&nbsp;<span style="color:red; font-style:italic; font-size:80%;">('.get_string('autoenrol:disabled','sloodle').')</span>';
+        if (!sloodle_autoenrol_enabled_site()) echo '<br />&nbsp;<span style="color:red; font-style:italic; font-size:80%;">('.get_string('autoenrol:disabled','sloodle').')</span>';
         echo '</p>';
-        
         
         // Close the form, along with a submit button
         echo "<input type=\"submit\" value=\"$strsubmit\" name=\"submit_course_options\"\>\n</form>\n";
@@ -184,10 +189,8 @@ class sloodle_view_course extends sloodle_base_view
         // Finish the box
         echo '</div>';
         sloodle_print_box_end();
-
         
-    //------------------------------------------------------
-
+        //------------------------------------------------------
         // Loginzone information
         sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow');
         echo '<div style="text-align:center;"><h3>'.get_string('loginzonedata','sloodle').'</h3>';
@@ -195,12 +198,11 @@ class sloodle_view_course extends sloodle_base_view
         $lastupdated = '('.get_string('unknown','sloodle').')';
         if ($this->sloodle_course->get_loginzone_time_updated() > 0) $lastupdated = date('Y-m-d H:i:s', $this->sloodle_course->get_loginzone_time_updated());
             
-        echo get_string('position','sloodle').': '.$this->sloodle_course->get_loginzone_position().'<br>';
-        echo get_string('size','sloodle').': '.$this->sloodle_course->get_loginzone_size().'<br>';
-        echo get_string('region','sloodle').': '.$this->sloodle_course->get_loginzone_region().'<br>';
-        echo get_string('lastupdated','sloodle').': '.$lastupdated.'<br>';
-        echo '<br>';
-        
+        echo get_string('position','sloodle').': '.$this->sloodle_course->get_loginzone_position().'<br />';
+        echo get_string('size','sloodle').': '.$this->sloodle_course->get_loginzone_size().'<br />';
+        echo get_string('region','sloodle').': '.$this->sloodle_course->get_loginzone_region().'<br />';
+        echo get_string('lastupdated','sloodle').': '.$lastupdated.'<br />';
+        echo '<br />';
         
         // Have we been instructed to clear all pending allocations?
         if (isset($_REQUEST['clear_loginzone_allocations'])) {
@@ -217,20 +219,13 @@ class sloodle_view_course extends sloodle_base_view
         echo get_string('pendingallocations','sloodle').': '.$allocs.'&nbsp;&nbsp;';
         echo '<input type="submit" name="clear_loginzone_allocations" value="'.get_string('delete','sloodle').'"/>';
         echo "</form>\n";
-        
-        
         echo '</div>';
         sloodle_print_box_end();
 
-        
-
-
-   
-//------------------------------------------------------
-
-    $course = $this->course;
-
+        //------------------------------------------------------
+        $course = $this->course;
     }
+
 
     /**
     * Print the footer for this course.
@@ -244,5 +239,3 @@ class sloodle_view_course extends sloodle_base_view
 
 }
 
-
-?>

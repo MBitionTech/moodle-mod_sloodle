@@ -42,8 +42,9 @@
     
 // MOODLE-SPECIFIC //
     // Check that the user has the Sloodle capability on this course
-    $course_context = get_context_instance(CONTEXT_COURSE, $sloodle->course->get_course_id());
-    $can_authorize = has_capability('mod/sloodle:objectauth' $course_context);
+    //$course_context = get_context_instance(CONTEXT_COURSE, $sloodle->course->get_course_id());
+    $course_context = context_course::instance($sloodle->course->get_course_id(), IGNORE_MISSING);
+    $can_authorize = has_capability('mod/sloodle:objectauth', $course_context);
     
 // END MOODLE-SPECIFIC //
     

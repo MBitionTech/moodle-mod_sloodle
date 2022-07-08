@@ -26,8 +26,8 @@ $configVars = array();
 $skipvars = array(
     'controllerid', // Should be in the layout entry
     'courseid', // Should come from the controller
-    'layoutentryid', // Layout entry
-    'rezzeruuid' // Doesn't belong in layout
+    'layoutentryid' // Layout entry
+//    'rezzeruuid' // Doesn't belong in layout
 );
 
 $layoutid = null;
@@ -35,13 +35,20 @@ foreach($_POST as $n => $v) {
     if (in_array($n, $skipvars)) {
         continue;
     }
+
 	if ($n == 'layoutid') {
 		$layoutid = intval($v);
-	} else if ($n == 'objectname') {
+	}
+    else if ($n == 'objectname') {
 		$objectname = $v;
-	} else if ($n == 'objectgroup') {
-		$objectgroup= $v;
-	} else {
+	}
+    else if ($n == 'objectgroup') {
+		$objectgroup = $v;
+	}
+    else if ($n == 'rezzeruuid') {
+		$rezzeruuid = $v;
+	}
+    else {
 		$configVars[$n] = $v;
 	}
 }
@@ -61,7 +68,8 @@ if (!$layout->load($layoutid)) {
 	error_output( 'Layout not found');
 }
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+$controller_context = context_module::instance($layout->controllerid);
 if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
         error_output( 'Access denied');
 }
@@ -119,7 +127,8 @@ $element_id = print_rezzable_item_li( $layoutentry, $courseid, $controllerid, $l
 $html_list_item = ob_get_clean();
 
 ob_start();
-$element_id = print_config_form( $layoutentry, $config, $courseid, $controllerid, $layoutid, $config->group, $rezzer->uuid);
+//$element_id = print_config_form( $layoutentry, $config, $courseid, $controllerid, $layoutid, $config->group, $rezzer->uuid);
+$element_id = print_config_form( $layoutentry, $config, $courseid, $controllerid, $layoutid, $config->group, $rezzeruuid);
 $edit_object_form = ob_get_clean();
 
 $content = array(

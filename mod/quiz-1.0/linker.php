@@ -47,7 +47,7 @@
     /** Include the Moodle quiz code.  */
     require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 
-//ini_set('display_errors','On'); 
+    //ini_set('display_errors','On'); 
 
     // Authenticate the request and login the user
     $sloodle = new SloodleSession();
@@ -56,7 +56,6 @@
     $sloodle->user->login();
 
     $sloodle->validate_requirements();
-
     
     // Grab our additional parameters
     $id = $sloodle->request->get_module_id();
@@ -88,8 +87,6 @@
     // Remove the above when we no longer need to support old objects
     // ...belonging to SLOODLE 2.0.13-alpha or earlier.
 
-
-
     // remember the current time as the time any responses were submitted
     // (so as to make sure students don't get penalized for slow processing on this page)
     $timestamp = time();
@@ -113,8 +110,8 @@
          }
 
          $id = $coursemod->id;
-
     }
+
     if ($id) {
         if (! $cm = get_coursemodule_from_id('quiz', $id)) {
             $sloodle->response->quick_output(-701, 'MODULE_INSTANCE', 'Identified module instance is not a quiz', FALSE);
@@ -130,8 +127,8 @@
             $sloodle->response->quick_output(-712, 'MODULE_INSTANCE', 'Part of quiz module instance is missing', FALSE);
             exit();
         }
-
-    } else {
+    }
+    else {
         if (! $quiz = sloodle_get_record("quiz", "id", $q)) {
             $sloodle->response->quick_output(-712, 'MODULE_INSTANCE', 'Could not find quiz module', FALSE);
             exit();
@@ -152,8 +149,8 @@
     // ...which went away in the new quiz engine.
     if ( ( $CFG->version < 2011070100 ) && ( function_exists('get_question_states') ) ) {
         require_once(SLOODLE_DIRROOT.'/mod/quiz-1.0/'.'linker_moodle_2_0_down.php');
-    } else {
+    }
+    else {
         require_once(SLOODLE_DIRROOT.'/mod/quiz-1.0/'.'linker_moodle_2_1_up.php');
     }
 
-?>

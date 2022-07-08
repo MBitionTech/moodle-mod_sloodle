@@ -54,10 +54,8 @@
         // Everything seems fine
         $sloodle->response->set_status_code(1);
         $sloodle->response->set_status_descriptor('OK');
-        
-
-    } else if ($sloodlegiveobject != '') {
-    
+    }
+    else if ($sloodlegiveobject != '') {
         $sloodle->validate_user(true);
 
         //$sloodle->validate_requirements();
@@ -72,10 +70,7 @@
         // ...and we don't need to preserve state in the script
         $sloodle->response->add_data_line($sloodleuuid); // avatar line
         $sloodle->response->add_data_line($sloodlegiveobject); // object
-
-
     }
-       // Output our response
+    // Output our response
     $sloodle->response->render_to_output();
     
-?>

@@ -37,6 +37,9 @@
     /** Include the Sloodle API. */
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     
+    $PAGE->set_url('/mod/sloodle/login/user_object_auth.php');
+    $PAGE->set_context(context_course::instance(SITEID, IGNORE_MISSING));
+
     // Display the page header
     $strsloodle = get_string('modulename', 'sloodle');
     sloodle_print_header_simple(get_string('userobjectauth', 'sloodle'), "&nbsp;", get_string('userobjectauth', 'sloodle'), "", "", true);
@@ -65,7 +68,8 @@
     // Does the avatar need to be registered?
     if (!$sloodle->user->is_avatar_loaded()) {
         // Make sure the user has permission to register their avatar
-        require_capability('mod/sloodle:registeravatar', get_context_instance(CONTEXT_SYSTEM));
+        //require_capability('mod/sloodle:registeravatar', get_context_instance(CONTEXT_SYSTEM));
+        require_capability('mod/sloodle:registeravatar', context_system::instance());
     
         // Get the parameters
         $sloodleuuid = required_param('sloodleuuid', PARAM_TEXT);
@@ -99,7 +103,8 @@
     }
     
     // Make sure the user has permission to authorise user objects
-    require_capability('mod/sloodle:userobjectauth', get_context_instance(CONTEXT_SYSTEM));
+    //require_capability('mod/sloodle:userobjectauth', get_context_instance(CONTEXT_SYSTEM));
+    require_capability('mod/sloodle:userobjectauth', context_system::instance());
 
     // Attempt to authorise the object
     if ($sloodle->user->authorise_user_object($sloodleauthid)) {

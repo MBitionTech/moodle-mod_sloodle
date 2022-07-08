@@ -5,15 +5,15 @@
 //  This fragment is called by /admin/index.php
 ////////////////////////////////////////////////////////////////////////////////
 
-$module->version  = 2011081701;
-$module->requires = 2007021500;  // Requires Moodle 1.8
+defined('MOODLE_INTERNAL') || die();
+if (!isset($plugin)) $plugin = new stdClass();
 
-// For Moodle 2, we have to pretend we don't work on Moodle 1.9 or Moodle gets upset.
-global $CFG;
-if ($CFG->version > 2010060800) {
-    $module->requires = 2010000000;  // Requires Moodle 2.0 
-}
+$plugin->requires  = 2013111800;        // Moodle 2.6
+$plugin->component = 'mod_sloodle';     // Full name of the module (used for diagnostics)
+$plugin->cron      = 60;
+$plugin->maturity  = MATURITY_STABLE;
 
-$module->cron     = 60;
+$plugin->release   = '2.2.0';           // JOG Branch
 
-?>
+$plugin->version   = 2016100200;        // The current module version (Date: YYYYMMDDXX)
+

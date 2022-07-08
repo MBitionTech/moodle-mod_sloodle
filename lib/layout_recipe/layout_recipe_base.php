@@ -203,8 +203,8 @@ class SloodleLayoutRowSet {
 	// Static method returning a SloodleLayoutRowSet instance consisting of a single row for a single object.
 	// Use this when you want to add a single object, and you know exactly where you want to put it.
 	// Allows you to place an object in a single function call, without all the rest of the RowSet bureaucracy.
-	function Point( $x, $y, $z, $rotation = "<0,0,0,0>" ) {
-
+	static function Point( $x, $y, $z, $rotation = "<0,0,0,0>" )
+    {
 		$row = new SloodleLayoutRow();
 		$row->setPosition( $x, $y, $z );
 		$row->setDimensions( $x = 1, $y = 1, $z = 1 );
@@ -215,7 +215,6 @@ class SloodleLayoutRowSet {
 		$rs->addRow( $row );
 
 		return $rs;
-
 	}
 
 	// Adds a SloodleLayoutRow instance to the set
@@ -265,10 +264,10 @@ class SloodleLayoutRowSet {
 		}
 
 		return true;
-
 	}
 
 }
+
 
 class SloodleLayoutRow {
 

@@ -30,7 +30,7 @@ class SloodlePluginPresenterSlideVideo extends SloodlePluginBasePresenterSlide
     * @access public
     * @return string|bool The ID of this plugin, or boolean false if this is a base class and should not be instantiated as a plugin.
     */
-    function sloodle_get_plugin_id()
+    static function sloodle_get_plugin_id()
     {
         return 'video';
     }
@@ -53,6 +53,7 @@ class SloodlePluginPresenterSlideVideo extends SloodlePluginBasePresenterSlide
         if (strpos($source, '/') === 0) return $CFG->wwwroot.$source;
         return $CFG->wwwroot.'/'.$source;
     }
+
 
     /**
     * Render the given slide for browser output -- NOTE: render to a string, and return the string.
@@ -91,6 +92,7 @@ XXXEODXXX;
         return $output;
     }
 
+
     /**
     * Render the given slide for virtual-world output.
     * This returns two items of data in a numeric array.
@@ -106,12 +108,15 @@ XXXEODXXX;
         
         // Check to see if we need to convert the video URL for video-sharing sites
         if (strpos($url, '://www.youtube.com') !== false || strpos($url, '://youtube.com') !== false) {
-            $url = preg_replace('/watch\?v\=/', 'embed/', $url);
-            //$type = 'web/*'; // Just display this like a regular 
+            $index = strpos($url, 'v=');
+            $vidid = substr($url, $index + 2, 11);
+            $url = "http://www.youtubemp4.com/video/".$vidid.".mp4";
+            $type = "video/mp4";
         }
 
         return array($type, $url);
     }
+
 
     /**
     * Gets the human-readable name of this plugin.
@@ -124,6 +129,7 @@ XXXEODXXX;
     {
         return 'Video';
     }
+
 
     /**
     * Gets the internal version number of this plugin.
@@ -138,8 +144,5 @@ XXXEODXXX;
         return 2009050600;
     }
 
-
 }
 
-
-?>

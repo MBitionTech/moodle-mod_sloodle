@@ -79,7 +79,8 @@ class sloodle_base_view_module extends sloodle_base_view
     /**
     * Constructor.
     */
-    function sloodle_base_view_module()
+    //function sloodle_base_view_module()
+    function __construct()
     {
     }
 
@@ -94,14 +95,14 @@ class sloodle_base_view_module extends sloodle_base_view
         // Note: some modules prefer 's' to indicate the instance number... may need to implement that as well.
         // Fetch the course module instance
         $id = required_param('id', PARAM_INT);
-        if (!$this->cm = get_coursemodule_from_id('sloodle', $id)) error('Course module ID was incorrect.');
+        if (!$this->cm = get_coursemodule_from_id('sloodle', $id)) print_error('Course module ID was incorrect.');
         // Fetch the course data
-        if (!$this->course = sloodle_get_record('course', 'id', $this->cm->course)) error('Failed to retrieve course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $this->cm->course)) print_error('Failed to retrieve course.');
         $this->sloodle_course = new SloodleCourse();
-        if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+        if (!$this->sloodle_course->load($this->course)) print_error(get_string('failedcourseload', 'sloodle'));
 
         // Fetch the SLOODLE instance itself
-        if (!$this->sloodle = sloodle_get_record('sloodle', 'id', $this->cm->instance)) error('Failed to find SLOODLE module instance');
+        if (!$this->sloodle = sloodle_get_record('sloodle', 'id', $this->cm->instance)) print_error('Failed to find SLOODLE module instance');
     }
 
     /**
@@ -112,11 +113,12 @@ class sloodle_base_view_module extends sloodle_base_view
         // Make sure the user is logged-in
         require_course_login($this->course, true, $this->cm);
 
-        add_to_log($this->course->id, 'sloodle', 'view sloodle module', "view.php?id={$this->cm->id}", "{$this->sloodle->id}", $this->cm->id);
+        //add_to_log($this->course->id, 'sloodle', 'view sloodle module', "view.php?id={$this->cm->id}", "{$this->sloodle->id}", $this->cm->id);
+        sloodle_add_to_log($this->course->id, 'module_viewed', 'view.php', array('id'=>$this->cm->id), 'view sloodle module');
         
         // Check for permissions
-        $this->module_context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        $this->module_context = context_module::instance($this->cm->id);
+        $this->course_context = context_course::instance($this->course->id, IGNORE_MISSING);
         if (has_capability('moodle/course:manageactivities', $this->module_context)) $this->canedit = true;
 
         // If the module is hidden, then can the user still view it?
@@ -135,7 +137,7 @@ class sloodle_base_view_module extends sloodle_base_view
     */
     function sloodle_print_header()
     {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         // Offer the user an 'update' button if they are allowed to edit the module
         $editbuttons = '';
@@ -144,7 +146,7 @@ class sloodle_base_view_module extends sloodle_base_view
         }
         // Display the header
         $navigation = "<a href=\"index.php?id={$this->course->id}\">".get_string('modulenameplural','sloodle')."</a> ->";
-        sloodle_print_header_simple(format_string($this->sloodle->name), "&nbsp;", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, navmenu($this->course, $this->cm));
+        sloodle_print_header_simple(format_string($this->sloodle->name), "&nbsp;", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, false);
 
         // Display the module name
         $img = '<img src="'.$CFG->wwwroot.'/mod/sloodle/icon.gif" width="16" height="16" alt=""/> ';
@@ -153,7 +155,8 @@ class sloodle_base_view_module extends sloodle_base_view
         // Display the module type and description
         $fulltypename = get_string("moduletype:{$this->sloodle->type}", 'sloodle');
         echo '<h4 style="text-align:center;">'.get_string('moduletype', 'sloodle').': '.$fulltypename;
-        echo sloodle_helpbutton("moduletype_{$this->sloodle->type}", $fulltypename, 'sloodle', true, false, '', true).'</h4>';
+        echo $OUTPUT->help_icon("moduletype_{$this->sloodle->type}", 'sloodle').'</h4>';
+
         // We'll apply a general introduction to all Controllers, since they seem to confuse lots of people!
         $intro = $this->sloodle->intro;
         if ($this->sloodle->type == SLOODLE_TYPE_CTRL) $intro = '<p style="font-style:italic;">'.get_string('controllerinfo','sloodle').'</p>' . $this->sloodle->intro;
@@ -178,6 +181,3 @@ class sloodle_base_view_module extends sloodle_base_view
         sloodle_print_footer($this->course);
     }
 }
-
-
-?>

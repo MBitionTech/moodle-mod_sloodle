@@ -23,13 +23,13 @@
     $modulefiles = sloodle_get_files($MODULESPATH, true);
     // Go through each file
     if (is_array($modulefiles)) {
-    	foreach ($modulefiles as $mf) {
-    		// Does this filename start with "module_" and end with ".php"?
-    		if (strcasecmp(substr($mf, 0, 7), 'module_') == 0 && strcasecmp(substr($mf, -4), '.php') == 0) {
-    			// Yes - include it
-    			include_once($MODULESPATH.'/'.$mf);
-    		}
-    	}
+        foreach ($modulefiles as $mf) {
+            // Does this filename start with "module_" and end with ".php"?
+            if (strcasecmp(substr($mf, 0, 7), 'module_') == 0 && strcasecmp(substr($mf, -4), '.php') == 0) {
+                // Yes - include it
+                include_once($MODULESPATH.'/'.$mf);
+            }
+        }
     }
     
     // We will store an associative array of module types to module class names
@@ -50,11 +50,15 @@
         }
     }
 
+
+    /////////////////////////////////////////////////////////////////////////
+
     /*
     Static method to return a list of available module types => module names.
     Avoids having to use the global variable elsewhere.
     */
-    function sloodle_available_modules() {
+    function sloodle_available_modules()
+    {
         global $SLOODLE_MODULE_CLASS;
         return $SLOODLE_MODULE_CLASS;
     }
@@ -73,7 +77,7 @@
         
         // Abort if the type is not recognised
         if (!array_key_exists($type, $SLOODLE_MODULE_CLASS)) {
-            sloodle_debug("Module load failed - type \"$type\" not recognised.<br/>");
+            sloodle_debug("Module load failed - type \"$type\" not recognised.<br />");
             return false;
         }
         // Construct the object, based on the class name in our array
@@ -82,13 +86,14 @@
         // Load the data from the database, if necessary
         if ($id != null) {
             if ($module->load((int)$id)) return $module;
-            sloodle_debug("Failed to load module data from database with ID $id.<br/>");
+            sloodle_debug("Failed to load module data from database with ID $id.<br />");
             return false;
         }
         
         // Everything seems OK
         return $module;
     }
+
     
     /**
     * Constructs and loads an appropriate SLOODLE module object, based on the 'sloodle' record (that is, the instance or instance ID).
@@ -114,6 +119,7 @@
         return sloodle_load_module($instance->type, $dummysession, (int)$cm->id);
     }
     
+
     /**
     * Constructs and loads an appropriate SLOODLE module object, based on the course module or course module ID.
     * The appropriate type is detected automatically.
@@ -138,4 +144,3 @@
         return sloodle_load_module($instance->type, $dummysession, (int)$cm->id);
     }
 
-?>

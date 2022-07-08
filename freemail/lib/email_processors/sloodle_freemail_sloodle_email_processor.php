@@ -243,7 +243,6 @@ class sloodle_freemail_sloodle_email_processor extends sloodle_freemail_email_pr
 
         $params = array('avuuid' => $avuuid, 'message' => $messagetext);
         return SloodleActiveObject::NotifySubscriberObjects('message_to_user', $instant_message_code, 0, 0, $params, false, true);
-
     }
 
 }

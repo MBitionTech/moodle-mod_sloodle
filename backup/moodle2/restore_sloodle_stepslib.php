@@ -4,8 +4,8 @@
 */
 class restore_sloodle_activity_structure_step extends restore_activity_structure_step {
        
-    protected function define_structure() {
-                    
+    protected function define_structure()
+    {
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
 
@@ -38,10 +38,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
                                                                                       
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
-
     }
 
-    protected function process_sloodle($data) {
+
+    protected function process_sloodle($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -58,8 +59,9 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
     }
 
-    protected function process_sloodle_controller($data) {
 
+    protected function process_sloodle_controller($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -71,11 +73,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_controller', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_tracker($data) {
 
+    protected function process_sloodle_tracker($data)
+   {
         global $DB;
 
         $data = (object)$data;
@@ -87,11 +89,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_tracker', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_presenter($data) {
 
+    protected function process_sloodle_presenter($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -103,11 +105,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_presenter', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_presenter_entry($data) {
 
+    protected function process_sloodle_presenter_entry($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -119,11 +121,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_presenter_entry', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_distributor($data) {
 
+    protected function process_sloodle_distributor($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -135,11 +137,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_distributor', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_distributor_entry($data) {
 
+    protected function process_sloodle_distributor_entry($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -151,11 +153,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // immediately after inserting "activity" record, call this
 
         $this->set_mapping('sloodle_distributor_entry', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_layout($data) {
 
+    protected function process_sloodle_layout($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -171,11 +173,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
         $newitemid = $DB->insert_record('sloodle_layout', $data);
         $this->set_mapping('sloodle_layout', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_user($data) {
 
+    protected function process_sloodle_user($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -186,7 +188,8 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // If the avatar is already there, map the record ID to the existing user.
         if ( $existing = $DB->get_record('sloodle_users', array( 'uuid' => $data->uuid ) ) ) {
             $newitemid = $existing->id;
-        } else {
+        }
+        else {
             // If the Moodle user is already there, create an avatar for them.
             $data->userid = $this->get_mappingid('user', $data->userid);
             // Only import avatars if we know which user they are.
@@ -196,11 +199,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         }
 
         $this->set_mapping('sloodle_user', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_currency_type($data) {
 
+    protected function process_sloodle_currency_type($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -211,16 +214,17 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         // If the avatar is already there, map the record ID to the existing user.
         if ( $existing = $DB->get_record('sloodle_currency_types', array( 'name' => $data->name) ) ) {
             $newitemid = $existing->id;
-        } else {
+        }
+        else {
             $newitemid = $DB->insert_record('sloodle_currency_types', $data);
         }
 
         $this->set_mapping('sloodle_currency_types', $oldid, $newitemid);
-
     }
  
-    protected function process_sloodle_layout_entry($data) {
 
+    protected function process_sloodle_layout_entry($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -230,11 +234,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
         $newitemid = $DB->insert_record('sloodle_layout_entry', $data);
         $this->set_mapping('sloodle_layout_entry', $oldid, $newitemid);
-
     }
 
-    protected function process_sloodle_layout_entry_config($data) {
 
+    protected function process_sloodle_layout_entry_config($data)
+    {
         global $DB;
 
         $data = (object)$data;
@@ -244,11 +248,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
         $newitemid = $DB->insert_record('sloodle_layout_entry_config', $data);
         $this->set_mapping('sloodle_layout_entry_config', $oldid, $newitemid);
-
     }
 
-    protected function after_execute() {
 
+    protected function after_execute()
+    {
         global $DB;
 
         // Add sloodle related files, no need to match by itemname (just internally handled context)
@@ -281,9 +285,7 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
                 $DB->update_record('files', $fr);
 
             }
-
         }
-
     }
 
 }

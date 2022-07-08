@@ -1,6 +1,6 @@
 <?php
-class sloodle_freemail_imap_message_handler {
-
+class sloodle_freemail_imap_message_handler
+{
     var $_connection = null;
 
     var $_html_message;
@@ -9,8 +9,9 @@ class sloodle_freemail_imap_message_handler {
     var $_attachments = array();
     var $_header;
 
-    public function connect($connection_string, $username, $password) {
 
+    public function connect($connection_string, $username, $password)
+    {
         // Reuse the existing connection if we have one and it's still alive.
         if ( !is_null($this->_connection)) { 
             if (@imap_ping($this->_connection) ) {
@@ -22,108 +23,125 @@ class sloodle_freemail_imap_message_handler {
 
         $this->_connection = @imap_open($connection_string, $username, $password);
         return $this->_connection;
-
     }
 
-    public function count() {
 
+    public function count()
+    {
         if (!$this->_connection) {
             return null;
         }
 
         return @imap_num_msg($this->_connection);
-    
     }
 
-    public function close() {
 
+    public function close()
+    {
         if (!$this->_connection) {
             return null;
         }
 
         return @imap_close($this->_connection);
-
     }
 
-    public function delete($mid) {
 
+    public function delete($mid)
+    {
         if (!$this->_connection) {
             return null;
         }
 
         return @imap_delete($this->_connection, $mid);
-
     }
 
-    public function expunge() {
 
+    public function expunge()
+    {
         if (!$this->_connection) {
             return null;
         }
 
         return @imap_expunge($this->_connection);
-
     }
 
-    public function load_header($mid) {
 
+    public function load_header($mid)
+    {
         return $this->_header = @imap_header($this->_connection,$mid); 
-
     }
 
-    public function load($mid) {
 
+    public function load($mid)
+    {
         return $this->_get_msg($mid);
-
     }
 
-    public function mark_flagged($mid) {
 
+    public function mark_flagged($mid)
+    {
         if (!$this->_connection) {
             return null;
         }
-
         return @imap_setflag_full($this->_connection, $mid, "\\Flagged");
-
     }
 
-    public function get_html_message() {
+
+    public function get_html_message()
+    {
         return $this->_html_message;
     }
 
-    public function get_plain_message() {
+
+    public function get_plain_message()
+    {
         return $this->_plain_message;
     }
 
-    public function get_charset() {
+
+    public function get_charset()
+    {
         return $this->_charset;
     }
     
-    public function get_attachments() {
+
+    public function get_attachments()
+    {
         return $this->_attachments;
     }
+
 
     public function get_header() {
         return $this->_header;
     }
 
-    public function get_subject() {
+
+    public function get_subject()
+    {
         return $this->_header->subject;
     }
 
-    public function get_date() {
+
+    public function get_date()
+    {
         return $this->_header->date;
     }
 
-    public function get_to_address() {
+
+    public function get_to_address()
+    {
         return $this->_header->toaddress;
     }
 
-    public function get_from_address() {
+
+    public function get_from_address()
+    {
         return $this->_header->fromaddress;
     }
 
-    public function get_size_in_bytes() {
+
+    public function get_size_in_bytes()
+    {
         return $this->_header->Size;
     }
     
@@ -135,10 +153,10 @@ class sloodle_freemail_imap_message_handler {
     ...who said:
     "Here is code to parse and decode all types of messages, including attachments. I've been using something like this for awhile now, so it's pretty robust."
     */
-    private function _get_msg($mid) {
+    private function _get_msg($mid)
+    {
         // input $mbox = IMAP stream, $mid = message id
         // output all the following:
-
         if (!$mbox = $this->_connection) {
             return false;
         }
@@ -150,19 +168,19 @@ class sloodle_freemail_imap_message_handler {
         $s = @imap_fetchstructure($mbox,$mid);
         if (!$s->parts) { // simple
             $this->_get_part($mid,$s,0);  // pass 0 as part-number
-        } else {  // multipart: cycle through each part
+        }
+        else {  // multipart: cycle through each part
             foreach ($s->parts as $partno0=>$p) {
                 $this->_get_part($mid,$p,$partno0+1);
             }
         }
-
         return true;
-
     }
 
-    private function _get_part($mid,$p,$partno) {
-        // $partno = '1', '2', '2.1', '2.1.3', etc if multipart, 0 if not multipart
 
+    private function _get_part($mid,$p,$partno)
+    {
+        // $partno = '1', '2', '2.1', '2.1.3', etc if multipart, 0 if not multipart
         if (!$mbox = $this->_connection) {
             return false;
         }
@@ -175,7 +193,8 @@ class sloodle_freemail_imap_message_handler {
         // Any part may be encoded, even plain text messages, so check everything.
         if ($p->encoding==4) {
             $data = quoted_printable_decode($data);
-        } elseif ($p->encoding==3) {
+        }
+        elseif ($p->encoding==3) {
             $data = base64_decode($data);
             // no need to decode 7-bit, 8-bit, or binary
         }
@@ -202,17 +221,20 @@ class sloodle_freemail_imap_message_handler {
             $filename = ($params['filename'])? $params['filename'] : $params['name'];
             // filename may be encoded, so see imap_mime_header_decode()
             $this->_attachments[$filename] = $data;  // this is a problem if two files have same name
-        } elseif ($p->type==0 && $data) {
+        }
+        elseif ($p->type==0 && $data) {
         // TEXT
             // Messages may be split in different parts because of inline attachments,
             // so append parts together with blank row.
             if (strtolower($p->subtype)=='plain') {
                 $this->_plain_message .= trim($data) ."\n\n";
-            } else {
-                $this->_html_message .= $data ."<br><br>";
+            }
+            else {
+                $this->_html_message .= $data ."<br /><br />";
                 $this->_charset = $params['charset'];  // assume all parts are same charset
             }
-        } elseif ($p->type==2 && $data) {
+        }
+        elseif ($p->type==2 && $data) {
             // EMBEDDED MESSAGE
             // Many bounce notifications embed the original message as type 2,
             // but AOL uses type 1 (multipart), which is not handled here.

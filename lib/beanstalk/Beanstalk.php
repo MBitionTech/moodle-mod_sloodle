@@ -19,8 +19,8 @@
  *
  * @link https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
  */
-class Socket_Beanstalk {
-
+class Socket_Beanstalk
+{
     /**
      * Holds a boolean indicating whether a connection to the server is
      * currently established or not.
@@ -66,7 +66,8 @@ class Socket_Beanstalk {
      *                          connection, defaults to `1`.
      * @return void
      */
-    public function __construct(array $config = array()) {
+    public function __construct(array $config = array())
+    {
         $defaults = array(
             'persistent' => true,
             'host' => '127.0.0.1',
@@ -76,14 +77,17 @@ class Socket_Beanstalk {
         $this->_config = $config + $defaults;
     }
 
+
     /**
      * Destructor, disconnects from the server.
      *
      * @return void
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->disconnect();
     }
+
 
     /**
      * Initiates a socket connection to the beanstalk server. The resulting
@@ -95,7 +99,8 @@ class Socket_Beanstalk {
      * @see Socket_Beanstalk::reserve()
      * @return boolean `true` if the connection was established, `false` otherwise.
      */
-    public function connect() {
+    public function connect()
+    {
         if (isset($this->_connection)) {
             $this->disconnect();
         }
@@ -120,15 +125,18 @@ class Socket_Beanstalk {
         return $this->connected;
     }
 
+
     /**
      * Closes the connection to the beanstalk server.
      *
      * @return boolean `true` if diconnecting was successful.
      */
-    public function disconnect() {
+    public function disconnect()
+    {
         if (!is_resource($this->_connection)) {
             $this->connected = false;
-        } else {
+        }
+        else {
             $this->connected = !fclose($this->_connection);
 
             if (!$this->connected) {
@@ -138,14 +146,17 @@ class Socket_Beanstalk {
         return !$this->connected;
     }
 
+
     /**
      * Returns collected error messages.
      *
      * @return array An array of error messages.
      */
-    public function errors() {
+    public function errors()
+    {
         return $this->_errors;
     }
+
 
     /**
      * Writes a packet to the socket. Prior to writing to the socket will check
@@ -154,7 +165,8 @@ class Socket_Beanstalk {
      * @param string $data
      * @return integer|boolean number of written bytes or `false` on error.
      */
-    protected function _write($data) {
+    protected function _write($data)
+    {
         if (!$this->connected && !$this->connect()) {
             return false;
         }
@@ -163,6 +175,7 @@ class Socket_Beanstalk {
         return fwrite($this->_connection, $data, strlen($data));
     }
 
+
     /**
      * Reads a packet from the socket. Prior to reading from the socket will
      * check for availability of the connection.
@@ -170,7 +183,8 @@ class Socket_Beanstalk {
      * @param int $length Number of bytes to read.
      * @return string|boolean Data or `false` on error.
      */
-    protected function _read($length = null) {
+    protected function _read($length = null)
+    {
         if (!$this->connected && !$this->connect()) {
             return false;
         }
@@ -186,11 +200,13 @@ class Socket_Beanstalk {
                 return false;
             }
             $packet = rtrim($data, "\r\n");
-        } else {
+        } 
+        else {
             $packet = stream_get_line($this->_connection, 16384, "\r\n");
         }
         return $packet;
     }
+
 
     /* Producer Commands */
 
@@ -208,7 +224,8 @@ class Socket_Beanstalk {
      * @return integer|boolean `false` on error otherwise an integer indicating
      *         the job id.
      */
-    public function put($pri, $delay, $ttr, $data) {
+    public function put($pri, $delay, $ttr, $data)
+    {
         $this->_write(sprintf('put %d %d %d %d', $pri, $delay, $ttr, strlen($data)));
         $this->_write($data);
         $status = strtok($this->_read(), ' ');
@@ -225,6 +242,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * The `use` command is for producers. Subsequent put commands will put jobs into
      * the tube specified by this command. If no use command has been issued, jobs
@@ -237,7 +255,8 @@ class Socket_Beanstalk {
      *        use.  If the tube does not exist, it will be created.
      * @return string|boolean `false` on error otherwise the name of the tube.
      */
-    public function choose($tube) {
+    public function choose($tube)
+    {
         $this->_write(sprintf('use %s', $tube));
         $status = strtok($this->_read(), ' ');
 
@@ -250,6 +269,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Alias for choose.
      *
@@ -257,9 +277,11 @@ class Socket_Beanstalk {
      * @param string $tube
      * @return string|boolean
      */
-    public function useTube($tube) {
+    public function useTube($tube)
+    {
         return $this->choose($tube);
     }
+
 
     /* Worker Commands */
 
@@ -271,10 +293,12 @@ class Socket_Beanstalk {
      * @return array|false `false` on error otherwise an array holding job id
      *         and body.
      */
-    public function reserve($timeout = null) {
+    public function reserve($timeout = null)
+    {
         if (isset($timeout)) {
             $this->_write(sprintf('reserve-with-timeout %d', $timeout));
-        } else {
+        }
+        else {
             $this->_write('reserve');
         }
         $status = strtok($this->_read(), ' ');
@@ -293,13 +317,15 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Removes a job from the server entirely.
      *
      * @param integer $id The id of the job.
      * @return boolean `false` on error, `true` on success.
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         $this->_write(sprintf('delete %d', $id));
         $status = $this->_read();
 
@@ -313,6 +339,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Puts a reserved job back into the ready queue.
      *
@@ -321,7 +348,8 @@ class Socket_Beanstalk {
      * @param integer $delay Number of seconds to wait before putting the job in the ready queue.
      * @return boolean `false` on error, `true` on success.
      */
-    public function release($id, $pri, $delay) {
+    public function release($id, $pri, $delay) 
+    {
         $this->_write(sprintf('release %d %d %d', $id, $pri, $delay));
         $status = $this->_read();
 
@@ -336,6 +364,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Puts a job into the `buried` state Buried jobs are put into a FIFO
      * linked list and will not be touched until a client kicks them.
@@ -344,7 +373,8 @@ class Socket_Beanstalk {
      * @param integer $pri *New* priority to assign to the job.
      * @return boolean `false` on error, `true` on success.
      */
-    public function bury($id, $pri) {
+    public function bury($id, $pri)
+    {
         $this->_write(sprintf('bury %d %d', $id, $pri));
         $status = $this->_read();
 
@@ -358,13 +388,15 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Allows a worker to request more time to work on a job
      *
      * @param integer $id The id of the job.
      * @return boolean `false` on error, `true` on success.
      */
-    public function touch($id) {
+    public function touch($id) 
+    {
         $this->_write(sprintf('touch %d', $id));
         $status = $this->_read();
 
@@ -378,6 +410,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Adds the named tube to the watch list for the current
      * connection.
@@ -385,7 +418,8 @@ class Socket_Beanstalk {
      * @param string $tube Name of tube to watch.
      * @return integer|boolean `false` on error otherwise number of tubes in watch list.
      */
-    public function watch($tube) {
+    public function watch($tube)
+    {
         $this->_write(sprintf('watch %s', $tube));
         $status = strtok($this->_read(), ' ');
 
@@ -398,13 +432,15 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Remove the named tube from the watch list.
      *
      * @param string $tube Name of tube to ignore.
      * @return integer|boolean `false` on error otherwise number of tubes in watch list.
      */
-    public function ignore($tube) {
+    public function ignore($tube)
+    {
         $this->_write(sprintf('ignore %s', $tube));
         $status = strtok($this->_read(), ' ');
 
@@ -418,6 +454,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /* Other Commands */
 
     /**
@@ -426,47 +463,56 @@ class Socket_Beanstalk {
      * @param integer $id The id of the job.
      * @return string|boolean `false` on error otherwise the body of the job.
      */
-    public function peek($id) {
+    public function peek($id)
+    {
         $this->_write(sprintf('peek %d', $id));
         return $this->_peekRead();
     }
+
 
     /**
      * Inspect the next ready job.
      *
      * @return string|boolean `false` on error otherwise the body of the job.
      */
-    public function peekReady() {
+    public function peekReady()
+    {
         $this->_write('peek-ready');
         return $this->_peekRead();
     }
+
 
     /**
      * Inspect the job with the shortest delay left.
      *
      * @return string|boolean `false` on error otherwise the body of the job.
      */
-    public function peekDelayed() {
+    public function peekDelayed()
+    {
         $this->_write('peek-delayed');
         return $this->_peekRead();
     }
+
 
     /**
      * Inspect the next job in the list of buried jobs.
      *
      * @return string|boolean `false` on error otherwise the body of the job.
      */
-    public function peekBuried() {
+    public function peekBuried()
+    {
         $this->_write('peek-buried');
         return $this->_peekRead();
     }
+
 
     /**
      * Handles response for all peek methods.
      *
      * @return string|boolean `false` on error otherwise the body of the job.
      */
-    protected function _peekRead() {
+    protected function _peekRead()
+    {
         $status = strtok($this->_read(), ' ');
 
         switch ($status) {
@@ -482,6 +528,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Moves jobs into the ready queue (applies to the current tube).
      *
@@ -491,7 +538,8 @@ class Socket_Beanstalk {
      * @param integer $bound Upper bound on the number of jobs to kick.
      * @return integer|boolean False on error otherwise number of job kicked.
      */
-    public function kick($bound) {
+    public function kick($bound)
+    {
         $this->_write(sprintf('kick %d', $bound));
         $status = strtok($this->_read(), ' ');
 
@@ -504,6 +552,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /* Stats Commands */
 
     /**
@@ -512,10 +561,12 @@ class Socket_Beanstalk {
      * @param integer $id The job id
      * @return string|boolean `false` on error otherwise a string with a yaml formatted dictionary
      */
-    public function statsJob($id) {
+    public function statsJob($id)
+    {
         $this->_write(sprintf('stats-job %d', $id));
         return $this->_statsRead();
     }
+
 
     /**
      * Gives statistical information about the specified tube if it exists.
@@ -523,17 +574,20 @@ class Socket_Beanstalk {
      * @param string $tube Name of the tube.
      * @return string|boolean `false` on error otherwise a string with a yaml formatted dictionary.
      */
-    public function statsTube($tube) {
+    public function statsTube($tube)
+    {
         $this->_write(sprintf('stats-tube %s', $tube));
         return $this->_statsRead();
     }
+
 
     /**
      * Gives statistical information about the system as a whole.
      *
      * @return string|boolean `false` on error otherwise a string with a yaml formatted dictionary.
      */
-    public function stats() {
+    public function stats()
+    {
         $this->_write('stats');
         return $this->_statsRead();
     }
@@ -543,20 +597,24 @@ class Socket_Beanstalk {
      *
      * @return string|boolean `false` on error otherwise a string with a yaml formatted list.
      */
-    public function listTubes() {
+    public function listTubes()
+    {
         $this->_write('list-tubes');
         return $this->_statsRead();
     }
+
 
     /**
      * Returns the tube currently being used by the producer.
      *
      * @return string|boolean `false` on error otherwise a string with the name of the tube.
      */
-    public function listTubeUsed() {
+    public function listTubeUsed()
+    {
         $this->_write('list-tube-used');
         return $this->_statsRead(false);
     }
+
 
     /**
      * Alias for listTubeUsed.
@@ -564,19 +622,23 @@ class Socket_Beanstalk {
      * @see Socket_Beanstalk::listTubeUsed()
      * @return string|boolean `false` on error otherwise a string with the name of the tube.
      */
-    public function listTubeChosen() {
+    public function listTubeChosen()
+    {
         return $this->listTubeUsed();
     }
+
 
     /**
      * Returns a list of tubes currently being watched by the worker.
      *
      * @return string|boolean `false` on error otherwise a string with a yaml formatted list.
      */
-    public function listTubesWatched() {
+    public function listTubesWatched()
+    {
         $this->_write('list-tubes-watched');
         return $this->_statsRead();
     }
+
 
     /**
      * Handles responses for all stat methods.
@@ -584,7 +646,8 @@ class Socket_Beanstalk {
      * @param boolean $decode Whether to decode data before returning it or not. Default is `true`.
      * @return array|string|boolean `false` on error otherwise statistical data.
      */
-    protected function _statsRead($decode = true) {
+    protected function _statsRead($decode = true)
+    {
         $status = strtok($this->_read(), ' ');
 
         switch ($status) {
@@ -597,6 +660,7 @@ class Socket_Beanstalk {
         }
     }
 
+
     /**
      * Decodes YAML data. This is a super naive decoder which just works on a
      * subset of YAML which is commonly returned by beanstalk.
@@ -604,14 +668,16 @@ class Socket_Beanstalk {
      * @param string $data The data in YAML format, can be either a list or a dictionary.
      * @return array An (associative) array of the converted data.
      */
-    protected function _decode($data) {
+    protected function _decode($data)
+    {
         $data = array_slice(explode("\n", $data), 1);
         $result = array();
 
         foreach ($data as $key => $value) {
             if ($value[0] === '-') {
                 $value = ltrim($value, '- ');
-            } elseif (strpos($value, ':') !== false) {
+            }
+            elseif (strpos($value, ':') !== false) {
                 list($key, $value) = explode(':', $value);
                 $value = ltrim($value, ' ');
             }
@@ -623,5 +689,3 @@ class Socket_Beanstalk {
         return $result;
     }
 }
-
-?>

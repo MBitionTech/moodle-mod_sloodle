@@ -34,7 +34,8 @@ if (!$courseid = $layout->course) {
 	error_output('Could not get courseid from layout');
 }
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+$controller_context = context_module::instance($layout->controllerid);
 if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
     error_output( 'Access denied');
 }

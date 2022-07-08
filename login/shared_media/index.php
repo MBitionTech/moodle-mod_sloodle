@@ -13,7 +13,8 @@ $errors = array();
 if ($username && $password) {
 	$user = authenticate_user_login($username, $password);
 	if ($user) {
-		add_to_log(SITEID, 'user', 'login', "", $user->id, 0, $user->id);
+		//add_to_log(SITEID, 'user', 'login', "", $user->id, 0, $user->id);
+        sloodle_add_to_log($course->id, 'media_login', 'login/shared_media/index.php',  array('username'=>$username, 'password'=>"XXX"), 'login');
 		$USER = complete_user_login($user);
 	} else {
 		$errors[] = 'invalidlogin';

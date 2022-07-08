@@ -29,10 +29,11 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
     * @access public
     * @return string|bool The ID of this plugin, or boolean false if this is a base class and should not be instantiated as a plugin.
     */
-    function sloodle_get_plugin_id()
+    static function sloodle_get_plugin_id()
     {
         return 'image';
     }
+
 
     /**
     * Construct an absolute URL, based on the given source data.
@@ -52,6 +53,7 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
         return $CFG->wwwroot.'/'.$source;
     }
 
+
     /**
     * Render the given slide for browser output -- NOTE: render to a string, and return the string.
     * The title of the slide need not be included -- simply the basic iFrame or embedded player etc.
@@ -64,6 +66,7 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
         $output = "<img src=\"{$url}\" alt=\"{$slide->name}\" />";
         return $output;
     }
+
 
     /**
     * Render the given slide for virtual-world output.
@@ -78,6 +81,7 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
         return array('image/*', $this->get_absolute_url($slide->source));
     }
 
+
     /**
     * Gets the human-readable name of this plugin.
     * This MUST be overridden by base classes. If not, it will just return the name of the class.
@@ -89,6 +93,7 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
     {
         return 'Image';
     }
+
 
     /**
     * Gets the internal version number of this plugin.
@@ -103,8 +108,5 @@ class SloodlePluginPresenterSlideImage extends SloodlePluginBasePresenterSlide
         return 2009050600;
     }
 
-
 }
 
-
-?>

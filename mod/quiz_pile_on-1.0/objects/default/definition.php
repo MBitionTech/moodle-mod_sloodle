@@ -7,17 +7,16 @@ $sloodleconfig->module_no_choices_message = 'noquizzes';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Quiz Pile-On');
-$sloodleconfig->field_sets = array( 
-	'generalconfiguration' => array( //TODO: Check defaults
-		'sloodlerepeat' => new SloodleConfigurationOptionYesNo( 'sloodlerepeat', 'repeatquiz', null, 0 ),
-		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlerandomize', 'randomquestionorder', null, 1 ),
-		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', null, 0 ),
-	),
-	'accesslevel' => array(
-		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
-		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
-		'sloodleobjectaccesslevelctrl' => $sloodleconfig->access_level_object_control_option()
-	)
 
+$sloodleconfig->field_sets = array( 
+        'generalconfiguration' => array( //TODO: Check defaults
+                'sloodlerepeat' => new SloodleConfigurationOptionYesNo( 'sloodlerepeat', 'repeatquiz', null, 0 ),
+                'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlerandomize', 'randomquestionorder', null, 1 ),
+                'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', null, 0 ),
+        ),
+        'accesslevel' => array(
+                'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
+                'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
+                'sloodleobjectaccesslevelctrl' => $sloodleconfig->access_level_object_control_option()
+        )
 );
-?>

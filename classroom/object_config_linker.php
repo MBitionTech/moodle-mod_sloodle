@@ -55,7 +55,8 @@
     // Add a note of the controller and course names to the outgoing data
     $sloodle->response->add_data_line(array('sloodlecontrollerid', $auth_obj->course->controller->get_id()));
     $sloodle->response->add_data_line(array('sloodlecoursename_short', $auth_obj->course->get_short_name()));
-    $sloodle->response->add_data_line(array('sloodlecoursename_full', $auth_obj->course->get_short_name()));//$auth_obj->course->get_full_name())); // Shortened... was causing memory errors!
+    //$auth_obj->course->get_full_name())); // Shortened... was causing memory errors!
+    $sloodle->response->add_data_line(array('sloodlecoursename_full',  $auth_obj->course->get_full_name()));
     
     // Fetch all the configuration settings
     $settings = sloodle_get_records('sloodle_object_config', 'object', $sloodleauthid);

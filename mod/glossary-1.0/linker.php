@@ -95,7 +95,8 @@
             $def = sloodle_clean_for_output($r->definition);
             $sloodle->response->add_data_line(array($concept, $def));
         }
-    } else {
+    }
+    else {
         $sloodle->response->set_status_code(-103);
         $sloodle->response->set_status_descriptor('SYSTEM');
         $sloodle->response->add_data_line('Failed to search glossary');
@@ -106,4 +107,3 @@
     $sloodle->response->render_to_output();
     sloodle_debug('</pre>');
     
-?>

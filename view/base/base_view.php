@@ -26,7 +26,8 @@ class sloodle_base_view
     /**
     * Constructor.
     */
-    function sloodle_base_view()
+    //function sloodle_base_view()
+    function __construct()
     {
     }
 
@@ -115,5 +116,3 @@ class sloodle_base_view
 
 }
 
-
-?>

@@ -19,7 +19,8 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $controllerid = optional_param('controllerid', 0, PARAM_INT);
 
 // TODO: What should this be? Probably not 1...
-$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+$controller_context = context_module::instance($controllerid);
 $can_use_layouts = has_capability('mod/sloodle:uselayouts', $controller_context);
 if (!$can_use_layouts) {
 	//include('../../../login/shared_media/index.php');
@@ -42,7 +43,8 @@ if (!$courseid = $layout->course) {
 
 $controllerid = optional_param('controllerid', 0, PARAM_INT);
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+$controller_context = context_module::instance($controllerid);
 if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
         error_output( 'Access denied');
 }

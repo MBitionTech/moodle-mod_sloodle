@@ -39,7 +39,8 @@ if ( !$rezzer->loadByUUID($rezzeruuid) ) {
 	error_output( 'Controller ID missing' );
 }
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+$controller_context = context_module::instance($controllerid);
 if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
         error_output( 'Access denied');
 }

@@ -23,9 +23,7 @@
 */
 class SloodlePluginBasePresenterSlide extends SloodlePluginBase
 {
-
     // DATA //
-
 
     // OVERRIDABLE FUNCTIONS //
     // These are functions which can be overridden by sub-classes.
@@ -43,6 +41,7 @@ class SloodlePluginBasePresenterSlide extends SloodlePluginBase
         return $output;
     }
 
+
     /**
     * Render the given slide for virtual-world output.
     * This returns two items of data in a numeric array.
@@ -57,6 +56,7 @@ class SloodlePluginBasePresenterSlide extends SloodlePluginBase
         return array('web', $slide->source);
     }
     
+
     /**
     * Gets the category to which this plugin belongs.
     * For example, Presenters have two plugin categories: slides, and importers.
@@ -67,7 +67,7 @@ class SloodlePluginBasePresenterSlide extends SloodlePluginBase
     * @access public
     * @return string The name of this category of plugin.
     */
-    function get_category()
+    static function get_category()
     {
         return 'presenter-slide';
     }
@@ -83,7 +83,6 @@ class SloodlePluginBasePresenterSlide extends SloodlePluginBase
 class SloodlePluginBasePresenterImporter extends SloodlePluginBase
 {
     // DATA //
-
 
     // OVERRIDABLE FUNCTIONS //
     // These are functions which can be overridden by sub-classes.
@@ -102,6 +101,7 @@ class SloodlePluginBasePresenterImporter extends SloodlePluginBase
         return false;
     }
     
+
     /**
     * Gets the category to which this plugin belongs.
     * For example, Presenters have two plugin categories: slides, and importers.
@@ -112,11 +112,9 @@ class SloodlePluginBasePresenterImporter extends SloodlePluginBase
     * @access public
     * @return string The name of this category of plugin.
     */
-    function get_category()
+    static function get_category()
     {
         return 'presenter-importer';
     }
 }
 
-
-?>

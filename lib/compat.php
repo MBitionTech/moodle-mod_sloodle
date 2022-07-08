@@ -3,8 +3,9 @@
 Functions used for compatibility where the Moodle APIs change.
 We should probably move db.php in here too.
 */
-function sloodle_require_js($js) {
 
+function sloodle_require_js($js)
+{
     global $PAGE;
     global $CFG;
 
@@ -12,54 +13,67 @@ function sloodle_require_js($js) {
     // We could probably go earlier than this, but this is where it definitively breaks.
     if ($CFG->version >= 2012120303) {
         $PAGE->requires->js( new moodle_url($js) );
-    } else {
+    }
+    else {
         require_js($js);
     }
-
 }
 
-function sloodle_helpbutton($page, $title, $module, $image =  null, $linktext = null, $text = null, $return = null, $imagetext = null) {
+
+/*
+function sloodle_helpbutton($page, $title, $module, $image =  null, $linktext = null, $text = null, $return = null, $imagetext = null)
+{
     global $CFG;
     global $OUTPUT;
-return;
+
+    return;
+
     if ($CFG->version >= 2012120303) {
-	$helpicon = new help_icon();
+        $helpicon = new help_icon();
         $helpicon->page = $page; // required
         $helpicon->text = $title; // required
         $helpicon->module = $module; // defaults to 'moodle'
         $helpicon->linktext = $linktext;
         echo $OUTPUT->help_icon($helpicon);
-    } else {
+    }
+    else {
         return helpbutton($page, $title, $module, $image, $linktext, $text, $return, $imagetext);
     }
 
 }
+*/
 
-function sloodle_heading($text, $align = null, $size = null, $class = null, $id = null) {
- 
+
+function sloodle_heading($text, $align = null, $size = null, $class = null, $id = null)
+{
     global $CFG;
     global $OUTPUT;
     if ($CFG->version >= 2012120303) {
         return $OUTPUT->heading($text, $size, $class, $id);
-    } else {
+    }
+    else {
         return print_heading($text, $align, $size, $class, true, $id);
     }
-
 }
 
-function sloodle_print_heading($text, $align = '', $size = 2, $class = 'main', $return = null, $id = null) {
+
+function sloodle_print_heading($text, $align = '', $size = 2, $class = 'main', $return = null, $id = null)
+{
     if ($return) {
         return sloodle_heading($text, $align , $size , $class , $id ); 
-    } else {
+    }
+    else {
         echo sloodle_heading($text, $align , $size , $class , $id ); 
     }
 }
 
-function sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags) {
- 
+
+function sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags)
+{
     global $CFG;
     global $OUTPUT;
     global $PAGE;
+
     if ($CFG->version >= 2012120303) {
         $PAGE->set_heading($heading); // Required
         $PAGE->set_title($title);
@@ -74,34 +88,41 @@ function sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $b
            }
         }
         return $OUTPUT->header();
-    } else {
+    }
+    else {
         return print_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags, true); 
     }
-
 }
 
-function sloodle_print_header($title='', $heading='', $navigation='', $focus='',$meta='', $cache=true, $button='&nbsp;', $menu='',$usexml=false, $bodytags='', $return=false)  {
+
+function sloodle_print_header($title='', $heading='', $navigation='', $focus='',$meta='', $cache=true, $button='&nbsp;', $menu='',$usexml=false, $bodytags='', $return=false)
+{
     if ($return) {
         return sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags); 
-    } else {
+    }
+    else {
         echo sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags); 
     }
 }
 
-function sloodle_print_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false) {
+
+function sloodle_print_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false)
+{
     if ($return) {
         return sloodle_header_simple($title, $heading, $navigation, $focus, $meta,$cache, $button, $menu, $usexml, $bodytags, true); 
-    } else {
+    }
+    else {
         echo sloodle_header_simple($title, $heading, $navigation, $focus, $meta,$cache, $button, $menu, $usexml, $bodytags, true); 
     }
 }
 
 
-function sloodle_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='') {
-
+function sloodle_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='')
+{
     global $CFG;
     global $OUTPUT;
     global $PAGE;
+
     if ($CFG->version >= 2012120303) {
         $PAGE->set_heading($heading); // Required
         $PAGE->set_title($title);
@@ -116,79 +137,93 @@ function sloodle_header_simple($title='', $heading='', $navigation='', $focus=''
            }
         }
         return $OUTPUT->header();
-    } else {
+    }
+    else {
         return print_header_simple($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags, true); 
     }
-
 }
 
 
-function sloodle_print_footer($course = null) {
- 
+function sloodle_print_footer($course = null)
+{
     global $CFG;
     global $OUTPUT;
+
     if ($CFG->version >= 2012120303) {
         echo $OUTPUT->footer($course);
-    } else {
+    }
+    else {
         print_footer($course);
     }
-
 }
 
-function sloodle_print_box($message, $classes = '', $ids = '') {
- 
+
+function sloodle_print_box($message, $classes = '', $ids = '')
+{
     global $CFG;
     global $OUTPUT;
+
     if ($CFG->version >= 2012120303) {
         echo $OUTPUT->box($message, $classes, $ids);
-    } else {
+    }
+    else {
         print_box($message, $classes, $ids);
     }
-
 }
 
-function sloodle_print_box_start($classes = '', $ids = '') {
- 
+
+function sloodle_print_box_start($classes = '', $ids = '')
+{
     global $CFG;
     global $OUTPUT;
+
     if ($CFG->version >= 2012120303) {
         echo $OUTPUT->box_start($classes, $ids);
-    } else {
+    }
+    else {
         print_box_start($classes, $ids);
     }
-
 }
 
-function sloodle_print_box_end() {
- 
+
+function sloodle_print_box_end()
+{
     global $CFG;
     global $OUTPUT;
+
     if ($CFG->version >= 2012120303) {
         echo $OUTPUT->box_end();
-    } else {
+    }
+    else {
         print_box_end();
     }
-
 }
 
-function sloodle_print_table($table) {
- 
+
+function sloodle_print_table($table, $align='center')
+{
     global $CFG;
+
+    if ($align) echo "<div align=\"$align\">";
     if ($CFG->version >= 2012120303) {
         // We've probably passed in a stdClass, so turn it into an html_table
         if (!is_a($table, 'html_table')) {
             $table = sloodle_cast(new html_table(), $table);
         }
         echo html_writer::table($table);
-    } else {
+    }
+    else {
         print_table($table);
     }
-
+    if ($align) echo '</div>';
 }
 
-function sloodle_cast($destination, stdClass $source) {
+
+function sloodle_cast($destination, stdClass $source)
+{
     $sourceReflection = new ReflectionObject($source);
     $sourceProperties = $sourceReflection->getProperties();
+
     foreach ($sourceProperties as $sourceProperty) {
         $name = $sourceProperty->getName();
         $destination->{$name} = $source->$name;

@@ -26,25 +26,27 @@
     require_once(SLOODLE_LIBROOT.'/general.php');
     /** Sloodle course data. */
     require_once(SLOODLE_LIBROOT.'/course.php');
-        require_once(SLOODLE_LIBROOT.'/io.php');
+    require_once(SLOODLE_LIBROOT.'/io.php');
 
     require_once(SLOODLE_LIBROOT.'/object_configs.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
     require_once(SLOODLE_LIBROOT.'/currency.php');
 
-     require_once('scoreboard_active_object.inc.php');
+    require_once('scoreboard_active_object.inc.php');
 
-        $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
-        $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
+    //
+    $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
+    $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
 
-        //$is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
+    //$is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
 
-        $is_admin = ( isset($_REQUEST['mode']) && ($_REQUEST['mode'] == 'admin') );
+    $is_admin = ( isset($_REQUEST['mode']) && ($_REQUEST['mode'] == 'admin') );
 
-        if ($is_admin) {
-                require_login($sao->course->id);
+    if ($is_admin) {
+        //require_login($sao->course->id);
+        require_login($sao->course->course_object->id);
         $is_logged_in = true;
-        }
+    }
 
     if ($is_admin) {
         require_capability('moodle/course:manageactivities', $sao->context);
@@ -73,19 +75,16 @@ header('Pragma: public');
     else{
         include('index.template.php');
     }
-    
 
     print_html_top('', $is_logged_in);
     //print_toolbar( $baseurl, $is_logged_in ) ;
 
-//    print_site_placeholder( $sitesURL );
-//    print_round_list( $roundrecs );
+    //print_site_placeholder( $sitesURL );
+    //print_round_list( $roundrecs );
 
-//krumo($student_scores);
-//krumo($score);
+    //krumo($student_scores);
+    //krumo($score);
 
     print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $is_admin?5:$sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
 
     print_html_bottom();
-
-?>

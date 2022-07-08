@@ -29,10 +29,11 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
     * @access public
     * @return string|bool The ID of this plugin, or boolean false if this is a base class and should not be instantiated as a plugin.
     */
-    function sloodle_get_plugin_id()
+    static function sloodle_get_plugin_id()
     {
         return 'web';
     }
+
 
     /**
     * Construct an absolute URL, based on the given source data.
@@ -51,6 +52,7 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
         if (strpos($source, '/') === 0) return $CFG->wwwroot.$source;
         return $CFG->wwwroot.'/'.$source;
     }
+
 
     /**
     * Render the given slide for browser output -- NOTE: render to a string, and return the string.
@@ -72,6 +74,7 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
         return $output;
     }
 
+
     /**
     * Render the given slide for virtual-world output.
     * This returns two items of data in a numeric array.
@@ -85,6 +88,7 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
         return array('text/html', $this->get_absolute_url($slide->source));
     }
 
+
     /**
     * Gets the human-readable name of this plugin.
     * This MUST be overridden by base classes. If not, it will just return the name of the class.
@@ -96,6 +100,7 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
     {
         return 'Web';
     }
+
 
     /**
     * Gets the internal version number of this plugin.
@@ -110,8 +115,5 @@ class SloodlePluginPresenterSlideWeb extends SloodlePluginBasePresenterSlide
         return 2009050600;
     }
 
-
 }
 
-
-?>

@@ -26,8 +26,8 @@ require_once(SLOODLE_LIBROOT.'/general.php');
 * Used to define the Sloodle module instance add/edit form.
 * @package sloodle
 */
-class mod_sloodle_mod_form extends moodleform_mod {
-
+class mod_sloodle_mod_form extends moodleform_mod
+{
     /**
     * Defines the form
     * @return void
@@ -35,8 +35,8 @@ class mod_sloodle_mod_form extends moodleform_mod {
     * @uses $COURSE
     * @uses $SLOODLE_TYPES
     */                         
-    function definition() {
-
+    function definition()
+    {
         global $CFG, $COURSE, $SLOODLE_TYPES;
         $mform    =& $this->_form;
 
@@ -49,13 +49,14 @@ class mod_sloodle_mod_form extends moodleform_mod {
         if (empty($this->_instance)) {
             // Yes - check for a 'type' parameter
             $sloodletype = required_param('type', PARAM_TEXT);
-        } else {
+        } 
+        else {
             // Fetch the instance data
             $rec = sloodle_get_record('sloodle', 'id', $this->_instance);
-            if (!$rec) error(get_string('modulenotfound'));
+            if (!$rec) print_error(get_string('modulenotfound'));
             // Get the module type
             if (empty($rec->type)) {
-                error(get_string('moduletypeunknown', 'sloodle'));
+                print_error(get_string('moduletypeunknown', 'sloodle'));
             }
             $sloodletype = $rec->type;
         }
@@ -75,11 +76,7 @@ class mod_sloodle_mod_form extends moodleform_mod {
         $mform->setDefault('type', $sloodletype);
         $typeelem->freeze();
         $typeelem->setPersistantFreeze(true);
-        if (method_exists($mform, 'setHelpButton')) { // Deprecated in Moodle 2, gone from 2.4
-            $mform->setHelpButton('type', array("moduletype_$sloodletype", get_string('moduletype','sloodle'), 'sloodle'));
-        } else {
-            $mform->addHelpButton('type', "moduletype_$sloodletype", 'sloodle');
-        }
+        $mform->addHelpButton('type', "moduletype_$sloodletype", 'sloodle');
                 
         // Make a text box for the name of the module
         $mform->addElement('text', 'name', get_string('name', 'sloodle'), array('size'=>'64'));
@@ -88,20 +85,21 @@ class mod_sloodle_mod_form extends moodleform_mod {
         // Set a client-size rule that an entry is required
         $mform->addRule('name', null, 'required', null, 'client');
 
-	if (method_exists($this,'add_intro_editor')) {
-		$this->add_intro_editor(true);
-	} else {
-		// Create an HTML editor for module description (intro text)
-		$mform->addElement('htmleditor', 'intro', get_string('description'));
-		// Make it raw type (so the HTML isn't filtered out)
-		$mform->setType('intro', PARAM_RAW);
-		// Make it required
-		$mform->addRule('intro', get_string('required'), 'required', null, 'client'); // Don't require description - PRB
-	}
+       if (method_exists($this,'standard_intro_elements')) {
+            $this->standard_intro_elements();
+        }
+        else if (method_exists($this,'add_intro_editor')) {
+            $this->add_intro_editor();
+        }
+        else {
+            // Create an HTML editor for module description (intro text)
+            $mform->addElement('htmleditor', 'intro', get_string('description'));
+            // Make it raw type (so the HTML isn't filtered out)
+            $mform->setType('intro', PARAM_RAW);
+            // Make it required
+            $mform->addRule('intro', get_string('required'), 'required', null, 'client'); // Don't require description - PRB
+        }
 
-
-        
-        
 //-------------------------------------------------------------------------------
         
         // This section adds form elements which are specific to module types.
@@ -114,10 +112,9 @@ class mod_sloodle_mod_form extends moodleform_mod {
 
         // Check which type is being added
         switch ($sloodletype) {
-        
-        // // CONTROLLER // //
-        
-        case SLOODLE_TYPE_CTRL:
+          // 
+          // // CONTROLLER // //
+          case SLOODLE_TYPE_CTRL:
             // Add the type-specific Header
             $mform->addElement('header', 'typeheader', $sloodletypefull);
             
@@ -129,10 +126,12 @@ class mod_sloodle_mod_form extends moodleform_mod {
             $mform->addElement('text', 'controller_password', get_string('primpass', 'sloodle'), array('size'=>'12','maxlength'=>'9'));
             if (method_exists($mform, 'setHelpButton')) { // Deprecated in Moodle 2, gone from 2.4
                 $mform->setHelpButton('controller_password', array('prim_password', get_string('help:primpassword','sloodle'), 'sloodle'));
-            } else {
+            }
+            else {
                 $mform->addHelpButton('controller_password', 'primpass','sloodle');
             }
             // Set the field requirements
+            $mform->setType('controller_password', PARAM_INT);
             $mform->setDefault('controller_password', mt_rand(100000000, 999999999));
             $mform->addRule('controller_password', null, 'numeric', null, 'client');
             
@@ -141,21 +140,19 @@ class mod_sloodle_mod_form extends moodleform_mod {
             
             break;
             
-            
-            
-        // // DISTRIBUTOR // //
-        
-        case SLOODLE_TYPE_DISTRIB:
-        
+          // // DISTRIBUTOR // //
+          case SLOODLE_TYPE_DISTRIB:
             // Add the type-specific Header
             $mform->addElement('header', 'typeheader', $sloodletypefull);
             
             // Add a note of the current distributor channel (read-only)
             $mform->addElement('text', 'distributor_channel', get_string('xmlrpc:channel', 'sloodle').': ', array('size'=>'40', 'readonly'=>'true', 'disabled'=>'true'));
+            $mform->setType('distributor_channel', PARAM_TEXT);
             $mform->setDefault('distributor_channel', '');
             
             // Add a note of the number of objects associated with this Distributor
             $mform->addElement('text', 'distributor_numobjects', get_string('numobjects', 'sloodle').': ', array('size'=>'4', 'readonly'=>'true', 'disabled'=>'true'));
+            $mform->setType('distributor_numobjects', PARAM_INT);
             $mform->setDefault('distributor_numobjects', '0');
             
             // Add a checkbox option to reset the Distributor, but only if this is an existing entry being updated
@@ -165,37 +162,40 @@ class mod_sloodle_mod_form extends moodleform_mod {
             
             break;
             
-            
-        // // SLIDESHOW // //
-        
-        case SLOODLE_TYPE_PRESENTER:
-        
+          // // SLIDESHOW // //
+          case SLOODLE_TYPE_PRESENTER:
             // Add the type-specific Header
             $mform->addElement('header', 'typeheader', $sloodletypefull);
 
             // Add boxes to enter the size of the frame
             $mform->addElement('text', 'presenter_framewidth', get_string('framewidth', 'sloodle').': ', array('size'=>'4'));
             $mform->addRule('presenter_framewidth', null, 'numeric', null, 'client');
+            $mform->setType('presenter_framewidth', PARAM_INT);
             $mform->setDefault('presenter_framewidth', 512);
             
             $mform->addElement('text', 'presenter_frameheight', get_string('frameheight', 'sloodle').': ', array('size'=>'4'));
             $mform->addRule('presenter_frameheight', null, 'numeric', null, 'client');
+            $mform->setType('presenter_frameheight', PARAM_INT);
             $mform->setDefault('presenter_frameheight', 512);
 
             break;
             
-            
-        // // TRACKER // //
-        
-        case SLOODLE_TYPE_TRACKER:
-        	// Nothing to do
-        	break;
+          // // TRACKER // //
+          case SLOODLE_TYPE_TRACKER:
+            $mform->addElement('header', 'typeheader', $sloodletypefull);
+            // Add a checkbox for whether or not this module is enabled
+            $mform->addElement('checkbox', 'tracker_autosend', get_string('tracker:autosend','sloodle'), get_string('tracker:autosend_desc','sloodle'));
+            $mform->setDefault('tracker_autosend', 1);
 
+            $all_currencies = SloodleCurrency::FetchIDNameHash();
+            $mform->addElement('select', 'tracker_currency', get_string('tracker:currency','sloodle'), $all_currencies);
+            $mform->addHelpButton('tracker_currency', 'tracker:currency', 'sloodle');
+            $mform->setDefault('tracker_currency', 1);
 
-        // // MAP // //
+            break;
 
-        case SLOODLE_TYPE_MAP:
-
+          // // MAP // //
+          case SLOODLE_TYPE_MAP:
             // Add the type-specific header
             $mform->addElement('header', 'typeheader', $sloodletypefull);
             
@@ -221,8 +221,9 @@ class mod_sloodle_mod_form extends moodleform_mod {
 
             break;
         
-        case SLOODLE_TYPE_AWARDS:
-        
+          // // AWARDS // //
+          case SLOODLE_TYPE_AWARDS:
+            // 
             global $CFG;           
             //This switch occures when the user adds a new award activity
             // Add the type-specific header
@@ -230,7 +231,7 @@ class mod_sloodle_mod_form extends moodleform_mod {
             //get all the assignments for the course
             $mform->addElement('image','SloodleAwardImage',SLOODLE_WWWROOT.'/lib/media/awardsmall.gif' );
             break;  
-         } 
+        } 
 //-------------------------------------------------------------------------------
         // Add the standard course module elements, except the group stuff (as Sloodle doesn't support it)
         $this->standard_coursemodule_elements(false);
@@ -240,6 +241,7 @@ class mod_sloodle_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+
     /**
     * Performs extra processing on the form after existing/default data has been specified.
     * @return void
@@ -247,6 +249,7 @@ class mod_sloodle_mod_form extends moodleform_mod {
     function definition_after_data() {
     }
     
+
     /**
     * Pre-processes form initial values.
     * Given an array of default values (element name => value) by reference, this function
@@ -256,35 +259,34 @@ class mod_sloodle_mod_form extends moodleform_mod {
     * @param array $default_values Array of element names to values/
     * @return void
     */
-    function data_preprocessing(&$default_values) {
+    function data_preprocessing(&$default_values)
+    {
         // Get the form
         $mform =& $this->_form;
         
         // Is this a new instance?
         if (empty($this->_instance)) return;
+
         // Check which type this is
         switch ($default_values['type']) {
-        case SLOODLE_TYPE_CTRL:
+          //
+          case SLOODLE_TYPE_CTRL:
             // Fetch the controller record
             $controller = sloodle_get_record('sloodle_controller', 'sloodleid', $this->_instance);
-            if (!$controller) error(get_string('secondarytablenotfound', 'sloodle'));
+            if (!$controller) print_error(get_string('secondarytablenotfound', 'sloodle'));
             
-            // Add in the 'enabled' value
-            $default_values['controller_enabled'] = $controller->enabled;
-            // Add in the prim password value
+            $default_values['controller_enabled']  = $controller->enabled;
             $default_values['controller_password'] = $controller->password;
             
             break;
             
-        case SLOODLE_TYPE_DISTRIB:
+          case SLOODLE_TYPE_DISTRIB:
             // Fetch the distributor record
             $distributor = sloodle_get_record('sloodle_distributor', 'sloodleid', $this->_instance);
-            if (!$distributor) error(get_string('secondarytablenotfound', 'sloodle'));
+            if (!$distributor) print_error(get_string('secondarytablenotfound', 'sloodle'));
             
-            // Add in the 'channel' value
             $default_values['distributor_channel'] = $distributor->channel;
             
-            // Retrieve all object entries for this Distributor
             $objects = sloodle_get_records('sloodle_distributor_entry', 'distributorid', $distributor->id);
             if (is_array($objects)) {
                 $default_values['distributor_numobjects'] = count($objects);
@@ -292,37 +294,43 @@ class mod_sloodle_mod_form extends moodleform_mod {
         
             break;
                 
-        case SLOODLE_TYPE_PRESENTER:
+          case SLOODLE_TYPE_PRESENTER:
             // Fetch the Presenter record.
             $presenter = sloodle_get_record('sloodle_presenter', 'sloodleid', $this->_instance);
-            if (!$presenter) error(get_string('secondarytablenotfound', 'sloodle'));
+            if (!$presenter) print_error(get_string('secondarytablenotfound', 'sloodle'));
 
             // Add in the dimensions of the frame
-            $default_values['presenter_framewidth'] = (int)$presenter->framewidth;
+            $default_values['presenter_framewidth']  = (int)$presenter->framewidth;
             $default_values['presenter_frameheight'] = (int)$presenter->frameheight;
 
             break;
             
-        case SLOODLE_TYPE_TRACKER:
-        	// Nothing to do
-        	break;
+          case SLOODLE_TYPE_TRACKER:
+            //
+            $tracker = sloodle_get_record('sloodle_tracker', 'sloodleid', $this->_instance);
+            if (!$tracker) print_error(get_string('secondarytablenotfound', 'sloodle'));
 
-        case SLOODLE_TYPE_MAP:
+            $default_values['tracker_autosend'] = (int)$tracker->autosend;
+            $default_values['tracker_currency'] = (int)$tracker->currency;
+            
+            break;
+
+          case SLOODLE_TYPE_MAP:
             // Fetch the map record
             $map = sloodle_get_record('sloodle_map', 'sloodleid', $this->_instance);
-            if (!$map) error(get_string('secondarytablenotfound', 'sloodle'));
+            if (!$map) print_error(get_string('secondarytablenotfound', 'sloodle'));
             
             // Add in all the values from the database
-            $default_values['map_initialx'] = $map->initialx;
-            $default_values['map_initialy'] = $map->initialy;
+            $default_values['map_initialx']    = $map->initialx;
+            $default_values['map_initialy']    = $map->initialy;
             $default_values['map_initialzoom'] = $map->initialzoom;
-            $default_values['map_showpan'] = $map->showpan;
-            $default_values['map_showzoom'] = $map->showzoom;
-            $default_values['map_allowdrag'] = $map->allowdrag;
+            $default_values['map_showpan']     = $map->showpan;
+            $default_values['map_showzoom']    = $map->showzoom;
+            $default_values['map_allowdrag']   = $map->allowdrag;
             
             break;
             
-        default:
+          default:
             // Nothing to do?
             break;
         }
@@ -337,15 +345,15 @@ class mod_sloodle_mod_form extends moodleform_mod {
      * @param array $data array of ("fieldname"=>value) of submitted data
      * @return bool,array Array of fieldnames to error messages, or boolean true if OK
      */
-    function validation($data) {
+    function validation($data, $file)
+    {
         global $SLOODLE_TYPES;
         // Prepare an array of error messages
         $errors = array();
     
         // Check which type is being used
-		switch ($data['type']) {
-        
-        case SLOODLE_TYPE_CTRL:
+        switch ($data['type']) {
+          case SLOODLE_TYPE_CTRL:
             // Check that the prim password is OK
             $pwd = '';
             if (isset($data['controller_password'])) $pwd = $data['controller_password'];
@@ -358,39 +366,35 @@ class mod_sloodle_mod_form extends moodleform_mod {
                 $errors['controller_password'] = '';
                 // Add our password errors
                 foreach ($pwderrors as $pe) {
-                    $errors['controller_password'] .= get_string("primpass:$pe", 'sloodle') . '<br>';
+                    $errors['controller_password'] .= get_string("primpass:$pe", 'sloodle') . '<br />';
                 }
             }
             
             break;
             
-            
-        case SLOODLE_TYPE_DISTRIB:
+          case SLOODLE_TYPE_DISTRIB:
             // Nothing to error check
             break;
          
-        
-        case SLOODLE_TYPE_PRESENTER:
+          case SLOODLE_TYPE_PRESENTER:
             // Nothing to error check
             break;
             
-        case SLOODLE_TYPE_TRACKER:
-        	// Nothing to error check
-        	break;
+          case SLOODLE_TYPE_TRACKER:
+            // Nothing to error check
+            break;
         
-        case SLOODLE_TYPE_MAP:
+          case SLOODLE_TYPE_MAP:
             // Nothing to error check
             break; 
 
-        // ADD FUTURE TYPES HERE
-           case SLOODLE_TYPE_AWARDS:           //MOVED TO 0.41
+          // ADD FUTURE TYPES HERE
+          case SLOODLE_TYPE_AWARDS:           //MOVED TO 0.41
             // Nothing to error check
-           break; 
+            break; 
 
-        // ADD FUTURE TYPES HERE
-        
-            
-        default:
+          // ADD FUTURE TYPES HERE
+          default:
             // We don't know the type
             $errors['type'] = get_string('moduletypeunknown', 'sloodle');
             break;
@@ -403,4 +407,3 @@ class mod_sloodle_mod_form extends moodleform_mod {
     }
 
 }
-?>

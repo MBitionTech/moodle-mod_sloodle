@@ -1,6 +1,7 @@
 <?php
-class SloodleObjectConfig {
 
+class SloodleObjectConfig 
+{
 	// The main, canonical name of the object corresponding to this config
 	var $primname; 
 
@@ -53,8 +54,10 @@ class SloodleObjectConfig {
 	
 	var $row_name= '';
 		
+
 	// static function returning an object configuration for an object with the given name, or none if none is found
-	function ForObjectName($objname, $createDummy = true) {
+	static function ForObjectName($objname, $createDummy = true)
+    {
 		$allconfigs = SloodleObjectConfig::AllAvailableAsArray();
 		if (isset($allconfigs[$objname])) {
 			return $allconfigs[$objname];
@@ -72,12 +75,13 @@ class SloodleObjectConfig {
 		//return null;
 	}
 
+
 	// Return a SloodleObjectDefinition object for the given mod directory
 	// The optional objcode not used yet as of 2011-07-01
 	// In future it will allow the same linker to be shared by multiple objects
 	// ...but the objects will have to know how to report their own codes.
-	function ForObjectType($type) {
-
+	static function ForObjectType($type)
+    {
 		$modname = null;
 		$objcode = null;
 
@@ -87,7 +91,8 @@ class SloodleObjectConfig {
 			$modname = $matches[1];
 			$objcode = $matches[2];
 		// Legacy types are just the name of the module, so we'll use the default definition.
-		} else {
+		}
+        else {
 			$modname = $type;
 			$objcode = 'default';
 		}
@@ -108,20 +113,22 @@ class SloodleObjectConfig {
         $sloodleconfig->modname    = $modname;
 
 		return $sloodleconfig;
-
 	}
 
-	function type() {
 
+	function type()
+    {
 		return $this->modname.'/'.$this->object_code;
-
 	}
+
 
 	// For anchors and things, we need a unique identifier to use internally, but with no slash in it.
-	function type_for_link() {
+	function type_for_link()
+    {
 		$t = preg_replace('/\//', '--', $this->type());
 		return preg_replace('/\./', '--', $t);
 	}
+
 
 	/*
 	Load an associative array of object definitions called object_configs, with the prim name as the key
@@ -138,12 +145,10 @@ class SloodleObjectConfig {
 	This doesn't make much sense, as quiz_pile_on scripts end up calling linkers under quiz-1.0 anyhow.
 	But we'll leave them for backwards compatibility until we can kill of the old HTML configuration forms.
 	*/
-	function AllAvailableAsArray($key = 'primname') {
-
+	static function AllAvailableAsArray($key = 'primname')
+    {
 		$currentdir = dirname(__FILE__);
-
 		$modtopdir = SLOODLE_DIRROOT.'/mod/';
-
 		$object_configs = array();
 
 		if (!is_dir($modtopdir)) {
@@ -152,21 +157,19 @@ class SloodleObjectConfig {
 		if (!$dh = opendir($modtopdir)) {
 			return false;
 		}
-		while (($moddir = readdir($dh)) !== false) {
 
+		while (($moddir = readdir($dh)) !== false) {
+            //
 			if ($moddir == '.') { 
 				continue;
 			}
-
 			if ($moddir == '..') { 
 				continue;
 			}
-
 			$object_dir = $modtopdir.'/'.$moddir.'/objects';
 			if ( !file_exists( $object_dir ) || !is_dir($object_dir) ) {
 				continue;
 			}
-
 			if (!$dh2 = opendir($object_dir)) {
 				continue;
 			}
@@ -176,8 +179,10 @@ class SloodleObjectConfig {
                 if ($object_code == '.') { 
                     continue;
                 }
-
                 if ($object_code == '..') { 
+                    continue;
+                }
+                if (preg_match("/^\./", $object_code)) {
                     continue;
                 }
 
@@ -186,7 +191,6 @@ class SloodleObjectConfig {
                 if ($sloodleconfig = SloodleObjectConfig::ForObjectType($object_type)) {
                     $object_configs[$sloodleconfig->$key] = $sloodleconfig;
                 }
-
 			}
 			closedir($dh2);
 		}
@@ -194,21 +198,22 @@ class SloodleObjectConfig {
 
 		return $object_configs;
 		//usort( $object_configs, array('SloodleObjectConfig', 'object_config_cmp') );
+    }
 
 
-        }
-
-	function object_config_cmp($a, $b) {
-		return $a->primname > $b->primname;
+	function object_config_cmp($a, $b)
+    {
+        return $a->primname > $b->primname;
 	}
+
 
 	/*
 	Static function returning a list of names of objects that want to be notified about something happening on the server.
 	You can say your object wants to be notified about something happening by putting the name of that something in the notify array in the object definition.
 	@param string $notification_action The thing you want to be notified about.
 	*/
-	function TypesOfObjectsRequiringNotification($notification_action) {
-
+	static function TypesOfObjectsRequiringNotification($notification_action)
+    {
 		$defs = SloodleObjectConfig::AllAvailableAsArray();
 		$types = array();
 		foreach($defs as $def) {
@@ -222,11 +227,11 @@ class SloodleObjectConfig {
 		}
 
 		return $types;
-
 	}
 
-	function AllAvailableAsArrayByGroup() {
 
+	static function AllAvailableAsArrayByGroup()
+    {
 		$objectconfigsbygroup = array();
 		$allconfigs = SloodleObjectConfig::AllAvailableAsArray();
 		ksort($allconfigs);
@@ -238,7 +243,6 @@ class SloodleObjectConfig {
 			$objectconfigsbygroup[$group][$objname] = $objconfig;
 		}
 		return $objectconfigsbygroup;
-
 	}
 
 
@@ -247,7 +251,7 @@ class SloodleObjectConfig {
 	* @param string $objid An object identifier, such as "chat-1.0"
 	* @return array A numeric array of name then version number.
 	*/
-	function ParseModIdentifier($modname)
+	static function ParseModIdentifier($modname)
 	{
 		// Find the last dash character, and split the string around it.
 		$lastpos = strrpos($modname, '-');
@@ -261,14 +265,15 @@ class SloodleObjectConfig {
 		return array($name, $version);
 	}
 
+
     /*
     Whether an object should be shown or not.
     Controlled by whether it declares that it's a collection of objects that we support.
     The collections we support are currently defined in the sloodle config
     ...although in future we'll probably improve on that to handle multiple different kinds of rezzer.
     */
-    function do_show() {
-
+    function do_show()
+    {
         $supported_collections = unserialize(SLOODLE_SUPPORTED_OBJECT_COLLECTIONS);
 
         // If you don't specify a collection, never show the object.
@@ -277,11 +282,11 @@ class SloodleObjectConfig {
         }
 
         return ( count( array_intersect( $supported_collections, $this->collections ) ) > 0 );;
-
     }
 
-	function AllAvailableAsNameVersionHash() {
 
+	function AllAvailableAsNameVersionHash()
+    {
 		$objs = array();
 		$all_available = SloodleObjectConfig::AllAvailableAsArray();
 
@@ -305,10 +310,11 @@ class SloodleObjectConfig {
 		return $objs;
 	}
 
+
 	// This creates a config element for a non-sloodle object, allowing us to rez and derez it.
 	// It is still assumed that it will have a sloodle_rezzer object script in it.
-	function ForNonSloodleObjectWithName( $name ) {
-
+	static function ForNonSloodleObjectWithName( $name )
+    {
 		// We need a url-safe version of the name
 		// J-query seems to choke on something, even if it's url-encoded.
 		$encoded_name = preg_replace("/[^a-zA-Z0-9]/", "", $name);
@@ -325,10 +331,11 @@ class SloodleObjectConfig {
 		$sloodleconfig->field_sets = array();
 
 		return $sloodleconfig;
-
 	}
 
-	function possibleObjectNames() {
+
+	function possibleObjectNames()
+    {
 		$names = array($this->primname);
 		if ( is_array($this->aliases) ) {
 			foreach($this->aliases as $al) {
@@ -338,9 +345,10 @@ class SloodleObjectConfig {
 		return $names;
 	}
 
-	// return an input widget for server access level
-	function access_level_server_option() {
 
+	// return an input widget for server access level
+	function access_level_server_option()
+    {
 		$ctrl = new SloodleConfigurationOptionSelectOne();
 		$ctrl->fieldname = 'sloodleserveraccesslevel';
 		$ctrl->title = 'accesslevelserver';
@@ -355,12 +363,12 @@ class SloodleObjectConfig {
 		$ctrl->type = 'radio'; // This is the recommended display type for the object.
 
 		return $ctrl;
-
 	}
 
-	// return an input widget for object use
-	function access_level_object_use_option() {
 
+	// return an input widget for object use
+	function access_level_object_use_option()
+    {
 		$ctrl = new SloodleConfigurationOptionSelectOne();
 		$ctrl->fieldname = 'sloodleobjectaccessleveluse';
 		$ctrl->title = 'accesslevelobject:use';
@@ -374,12 +382,12 @@ class SloodleObjectConfig {
 		$ctrl->type = 'radio'; // This is the recommended display type for the object.
 
 		return $ctrl;
-
 	}
 
-	// return an input widget for object control
-	function access_level_object_control_option() {
 
+	// return an input widget for object control
+	function access_level_object_control_option()
+    {
 		$ctrl = new SloodleConfigurationOptionSelectOne();
 		$ctrl->fieldname = 'sloodleobjectaccesslevelctrl';
 		$ctrl->title = 'accesslevelobject:control';
@@ -393,11 +401,11 @@ class SloodleObjectConfig {
 		$ctrl->type = 'radio'; // This is the recommended display type for the object.
 
 		return $ctrl;
-
 	}
 
-	function course_module_select( $courseid, $val = null ) {
 
+	function course_module_select( $courseid, $val = null ) 
+    {
 		if (!$options = $this->course_module_options( $courseid )) {
 			return false;
 		}
@@ -423,8 +431,9 @@ class SloodleObjectConfig {
 		}
 		*/
 		return $str;	
-		
 	}
+
+
 	/*
 	function course_module_select( $courseid, $val = null ) {
 
@@ -442,7 +451,10 @@ class SloodleObjectConfig {
 	}
 	*/
 
-	function course_module_options( $courseid )  {
+
+	function course_module_options( $courseid )
+    {
+		global $DB;
 
 		$options = array();
 
@@ -475,13 +487,22 @@ class SloodleObjectConfig {
 			if (!$inst) {
 				continue;
 			}
-
 			$skip = false;
-			if (is_array($this->module_filters)) {
-				foreach($this->module_filters as $n => $v) {
-					if ($inst->$n != $v) {
-						$skip = true;
-						break;
+
+            // by Fumi.Iseki for assign module
+			if ($modtype=='assign') {
+                $cond = $this->module_filters;
+				$cond['assignment'] = $cm->instance;
+				$assign = $DB->get_record('assign_plugin_config', $cond);
+				if (!$assign or $assign->value==0) $skip = true;
+			}
+			else {
+				if (is_array($this->module_filters)) {
+					foreach($this->module_filters as $n => $v) {
+						if ($inst->$n != $v) {
+							$skip = true;
+							break;
+						}
 					}
 				}
 			}
@@ -497,8 +518,8 @@ class SloodleObjectConfig {
 		natcasesort($options);
 
 		return $options;
-	
 	}
+
 
 	/*
 	Return an array of configuration options related to giving someone points for interacting with the object.
@@ -517,7 +538,6 @@ class SloodleObjectConfig {
 	Getting an answer wrong gives you [   ] of the currency [               ]
 	Getting an answer wrong costs you [   ] of the currency [               ]
 	*/
-
 	function awards_deposit_options( $interactions_to_labels ) {
 		
 		$configs = array();
@@ -538,11 +558,11 @@ class SloodleObjectConfig {
 		}
 
 		return $configs;
-
 	}
 
-	function awards_require_options( $interactions_to_labels = null ) {
 
+	function awards_require_options( $interactions_to_labels = null )
+    {
 		if ($interactions_to_labels == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectrequires', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
 			//$interactions_to_labels = array('default' => array('awards:interactwithobjectrequires') );
@@ -569,11 +589,11 @@ class SloodleObjectConfig {
 		}
 
 		return $configs;
-
 	}
 
-	function awards_withdraw_options( $interactions_to_labels = null ) {
 
+	function awards_withdraw_options( $interactions_to_labels = null )
+    {
 		if ($interactions_to_labels == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectwithdraws', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
 			$interactions_to_labels = array('default' => 'awards:interactwithobjectwithdraws' );
@@ -599,11 +619,11 @@ class SloodleObjectConfig {
 		}
 
 		return $configs;
-
 	}
 
-	function module_choice( $courseid ) {
 
+	function module_choice( $courseid )
+    {
 		if (!$this->module) {
 			return null;
 		}
@@ -613,13 +633,13 @@ class SloodleObjectConfig {
 
 		$op->is_value_translatable = false;
 		return $op;
-
 	}
+
 
 	// Over-write in the default values of the fields 
 	// ...with the ones specified in the $settings name=>value hash.
-	function populateDefaults( $settings ) {
-		
+	function populateDefaults( $settings )
+    {
 		foreach($this->field_sets as $n=>$fs) {
 			foreach($fs as $f) {
 				if ( isset($settings[ $f->field_name ] ) ) {
@@ -627,11 +647,11 @@ class SloodleObjectConfig {
 				}
 			}
 		}
-
 	}
 
-	function field_set_row_groups() {
 
+	function field_set_row_groups()
+    {
 		$fsgs = array();
 		foreach($this->field_sets as $n => $fs) {
 			$rowgroups = array();
@@ -656,9 +676,9 @@ var_dump($fsgs);
 print "<hr>";
 exit;
 */
-
 		return $fsgs;
 	}
+
 
     /*
     Return all object definitions that say they have the capability of the specified task.
@@ -667,8 +687,8 @@ exit;
     This is done by defining a capabilities array, like:
         $sloodleconfig->capabilities = array('distributor_send_object_http_in');
     */
-    function DefinitionsOfObjectsCapableOf($task) {
-
+    static function DefinitionsOfObjectsCapableOf($task)
+    {
         $definitions = SloodleObjectConfig::AllAvailableAsArray();
 
         $capable_defs = array();
@@ -687,14 +707,15 @@ exit;
         return $capable_defs;
 
     }
-
 }
+
+
 
 // Represents a single entry or potential entry in an object configuration.
 // eg. sloodlemoduleid or sloodlerefreshtime
 // 
-class SloodleConfigurationOption {
-
+class SloodleConfigurationOption
+{
 	// the fieldname of the option
 	var $fieldname;
 
@@ -730,7 +751,8 @@ class SloodleConfigurationOption {
 	// Return an array of translated options.
 	// Usually we'd keep our options untranslated, and translate them at the last minute.
 	// But sometimes, eg with things from the database, there are no translations.
-	function translatedOptions() {
+	function translatedOptions()
+    {
 		if (!$this->is_value_translatable) {
 			return $this->options;
 		}
@@ -747,9 +769,12 @@ class SloodleConfigurationOption {
 		return $to;
 	}
 
-	function renderForMoodleForm() {
+
+	function renderForMoodleForm()
+    {
 
 	}
+
 
 	function renderForIUIForm() {
 
@@ -757,9 +782,13 @@ class SloodleConfigurationOption {
 
 }
 
-class SloodleConfigurationOptionYesNo extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionYesNo( $fieldname, $title, $description = '', $default = 0 ) {
+
+class SloodleConfigurationOptionYesNo extends SloodleConfigurationOption
+{
+	//function SloodleConfigurationOptionYesNo( $fieldname, $title, $description = '', $default = 0 )
+	function __construct( $fieldname, $title, $description = '', $default = 0 )
+    {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
@@ -767,12 +796,15 @@ class SloodleConfigurationOptionYesNo extends SloodleConfigurationOption {
 		$this->default = $default;
 		$this->type = 'yesno';
 	}
-
 }
 
-class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionText( $fieldname, $title, $description, $default = '', $length = 8 ) {
+
+class SloodleConfigurationOptionText extends SloodleConfigurationOption
+{
+	//function SloodleConfigurationOptionText( $fieldname, $title, $description, $default = '', $length = 8 )
+	function __construct( $fieldname, $title, $description, $default = '', $length = 8 )
+    {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
@@ -784,10 +816,14 @@ class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 
 }
 
-// NB This could be presented as a set of radio buttons rather than a select
-class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionSelectOne( $fieldname = null, $title = null, $no_option_text = null, $description = null, $options = array(), $default = null) {
+
+// NB This could be presented as a set of radio buttons rather than a select
+class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption
+{
+	//function SloodleConfigurationOptionSelectOne( $fieldname = null, $title = null, $no_option_text = null, $description = null, $options = array(), $default = null)
+	function __construct( $fieldname = null, $title = null, $no_option_text = null, $description = null, $options = array(), $default = null)
+    {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->no_option_text = $no_option_text;
@@ -797,21 +833,25 @@ class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption {
 		$this->type = 'select_one';
 	}
 
-	function renderForMoodleForm($selectedoption) {
-	}
 
+	//function renderForMoodleForm($selectedoption) {
+	function renderForMoodleForm() {
+	}
 }
 
-// A setting needing a choice of course modules
-class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationOptionSelectOne {
 
+
+// A setting needing a choice of course modules
+class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationOptionSelectOne
+{
 	// The message displayed if there are no module instances available
 	var $noneavailablemessage = '';
 
 	// An array of key-value pairs for filtering the instance modules
 	var $instancefilters = array();
 
-	function SloodleConfigurationOptionCourseModuleChoice( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
+	//function SloodleConfigurationOptionCourseModuleChoice( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
+	function __construct( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->is_value_translatable = false;
@@ -819,16 +859,15 @@ class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationO
 		$this->options = $this->course_module_options();
 		$this->instancefilters = $instancefilters;
 	}
-
-
-
-
 }
 
-class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionCurrencyChoice( $fieldname, $title, $description, $default = '', $length = 8 ) {
 
+class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOption
+{
+	//function SloodleConfigurationOptionCurrencyChoice( $fieldname, $title, $description, $default = '', $length = 8 ) {
+	function __construct( $fieldname, $title, $description, $default = '', $length = 8 )
+    {
 		if ( !$currencies = SloodleCurrency::FetchAll() ) {
 			return false;
 		}
@@ -851,6 +890,4 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 		$this->type = 'select';
 		$this->is_value_translatable = false;
 	}
-
 }
-?>

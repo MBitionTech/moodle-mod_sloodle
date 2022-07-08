@@ -30,9 +30,11 @@ class sloodle_view_controller extends sloodle_base_view_module
     /**
     * Constructor.
     */
-    function sloodle_view_controller()
+    //function sloodle_view_controller()
+    function __construct()
     {
     }
+
 
     /**
     * Uses the parent class to process basic request information, then obtains additional Controller data.
@@ -42,8 +44,9 @@ class sloodle_view_controller extends sloodle_base_view_module
         // Process basic data first
         parent::process_request();
         // Obtain the Controller-specific data
-        if (!$this->controller = sloodle_get_record('sloodle_controller', 'sloodleid', $this->sloodle->id)) error('Failed to locate Controller data');
+        if (!$this->controller = sloodle_get_record('sloodle_controller', 'sloodleid', $this->sloodle->id)) print_error('Failed to locate Controller data');
     }
+
 
     /**
     * Process any form data which has been submitted.
@@ -51,6 +54,7 @@ class sloodle_view_controller extends sloodle_base_view_module
     function process_form()
     {
     }
+
 
     /**
     * Render the view of the Controller.
@@ -73,24 +77,22 @@ class sloodle_view_controller extends sloodle_base_view_module
         echo '<p style="font-size:14pt;">'.get_string('status', 'sloodle').': ';
         if ($this->controller->enabled) {
             echo '<span style="color:green; font-weight:bold;">'.get_string('enabled','sloodle').'</span>';
-        } else {
+        }
+        else {
             echo '<span style="color:red; font-weight:bold;">'.get_string('disabled','sloodle').'</span>';
         }
         echo "</p>\n";
         
         // Can the user access protected data?
         if ($this->canedit) {
-       
             // Active (authorised) objects
             sloodle_print_box_start('generalbox boxaligncenter boxwidthwide');
             echo '<h3>'.get_string('authorizedobjects','sloodle').'</h3>';
             
             // Has a delete objects action been requested
             if ($action == 'delete_objects') {
-                
                 // Count how many objects we delete
                 $numdeleted = 0;
-                
                 // Go through each request parameter
                 foreach ($_REQUEST as $name => $val) {
                     // Is this a delete objects request?
@@ -103,12 +105,10 @@ class sloodle_view_controller extends sloodle_base_view_module
                             // Delete any associated configuration settings too
                             sloodle_delete_records('sloodle_object_config', 'object', (int)$parts[1]);
                         }
-                        
                     }
                 }
-                
                 // Indicate our results
-                echo '<span style="color:red; font-weight:bold;">'.get_string('numdeleted','sloodle').': '.$numdeleted.'</span><br><br>';
+                echo '<span style="color:red; font-weight:bold;">'.get_string('numdeleted','sloodle').': '.$numdeleted.'</span><br /><br />';
             }
             
             // Get all objects authorised for this controller
@@ -124,7 +124,8 @@ class sloodle_view_controller extends sloodle_base_view_module
                     if (empty($obj->type)) continue;
                     // Construct a link to this object's configuration page
                     $config_link = "<a href=\"{$CFG->wwwroot}/mod/sloodle/classroom/configure_object.php?sloodleauthid={$obj->id}\">";
-                    $objects_table->data[] = array($config_link.$obj->name.'</a>', $obj->uuid, $obj->type, date('Y-m-d H:i:s T', (int)$obj->timeupdated), "<input type=\"checkbox\" name=\"sloodledeleteobj_{$obj->id}\" value=\"true\" /");
+                    $objects_table->data[] = array($config_link.$obj->name.'</a>', $obj->uuid, $obj->type, date('Y-m-d H:i:s T', (int)$obj->timeupdated), 
+                                                    "<input type=\"checkbox\" name=\"sloodledeleteobj_{$obj->id}\" value=\"true\" /");
                 }
                 
                 // Display a form and the table
@@ -134,20 +135,14 @@ class sloodle_view_controller extends sloodle_base_view_module
                 
                 sloodle_print_table($objects_table);
                 echo '<input type="submit" value="'.get_string('deleteselected','sloodle').'"/>';
-                
                 echo '</form>';
-                
-            } else {
-                echo '<span style="text-align:center;color:red">'.get_string('noentries','sloodle').'</span><br>';
             }
-            
+            else {
+                echo '<span style="text-align:center;color:red">'.get_string('noentries','sloodle').'</span><br />';
+            }
             sloodle_print_box_end();
         }
-        
         echo "</div>\n"; 
     }
 
 }
-
-
-?>

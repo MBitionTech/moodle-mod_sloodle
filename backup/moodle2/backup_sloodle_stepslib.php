@@ -4,10 +4,10 @@
 /**
  * Define the complete sloodle structure for backup, with file and id annotations
  */     
-class backup_sloodle_activity_structure_step extends backup_activity_structure_step {
-     
-    protected function define_structure() {
- 
+class backup_sloodle_activity_structure_step extends backup_activity_structure_step
+{
+    protected function define_structure()
+    {
         // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
 
@@ -175,9 +175,9 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
         $sloodlecurrencytype->set_source_table('sloodle_currency_types', array());
         //$sloodleuser->set_source_sql("SELECT * FROM {sloodle_users} ORDER BY id", array());
 
-
         if ($userinfo) {
         }
+
         $distributor->set_source_table('sloodle_distributor', array('sloodleid' => backup::VAR_ACTIVITYID));
         $tracker->set_source_table('sloodle_tracker', array('sloodleid' => backup::VAR_ACTIVITYID));
         $presenter->set_source_table('sloodle_presenter', array('sloodleid' => backup::VAR_ACTIVITYID));
@@ -203,7 +203,6 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
  
         // Return the root element (sloodle), wrapped into standard activity structure
         return $this->prepare_activity_structure($sloodle);
- 
     }
 
 }

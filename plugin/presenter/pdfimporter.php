@@ -48,10 +48,11 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     * @access public
     * @return string|bool The ID of this plugin, or boolean false if this is a base class and should not be instantiated as a plugin.
     */
-    function sloodle_get_plugin_id()
+    static function sloodle_get_plugin_id()
     {
         return 'pdf-imagemagick';
     }
+
 
     /**
     * Render this importer on a web page.
@@ -88,10 +89,10 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $localfile = ''; $clientfile = '';
             $res = $this->process_upload($localfile, $clientfile);
             if ($res === true) {
-                sloodle_debug("Upload successful<br/>\n");
+                sloodle_debug("Upload successful<br />\n");
                 return $this->import_file($presenter, $localfile, $importname, $position, $clientfile);
             }
-            if (is_string($res)) error($res, $url.'&amp;mode=edit');
+            if (is_string($res)) print_error($res, $url.'&amp;mode=edit');
         }
 
         // No file specified - display forms to let the user select or upload the file.
@@ -105,15 +106,15 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         echo '<input type="hidden" name="id" id="id" value="'.$presenter->cm->id.'" />';
         echo '<input type="hidden" name="mode" id="mode" value="importslides" />';
         echo '<input type="hidden" name="sloodleplugintype" id="sloodleplugintype" value="'.$this->sloodle_get_plugin_id().'" />';
-        echo '</fieldset><br/>';
+        echo '</fieldset><br />';
 
         // Let the user specify a name for the imported files
         echo '<label for="importname" title="'.$strimportnamecaption.'">'.$strimportname.': </label>';
         echo '<input type="text" name="importname" id="importname" value="" size="30" maxlength="100" title="'.$strimportnamecaption.'" />';
-        echo "<br/><br/>\n";
+        echo "<br /><br />\n";
         // Let the user select the position to upload to in the Presentation
         $this->print_slide_position_menu($presenter, $position);
-        echo "<br/><br/>\n";
+        echo "<br /><br />\n";
 
         // Display our upload form
         echo '<fieldset style="width:50%; margin-left:auto; margin-right:auto;">';
@@ -121,18 +122,18 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         echo '<input type="hidden" name="MAX_FILE_SIZE" value="'.$maxsize.'" />';
         echo '<label for="userfile">'.$strselectuploadfile.': </label>';
         echo '<input type="file" name="userfile" id="userfile" size="50" />';
-        echo '<p style="font-style:italic; font-size:90%;">['.get_string('upload:maxsize', 'sloodle', $maxsizedesc)."]</p><br/>\n";
-        echo '<input type="submit" name="uploadfile" id="uploadfile" value="'.$struploadfile.'" /><br/>'."\n";
-        echo '</fieldset><br/>';
+        echo '<p style="font-style:italic; font-size:90%;">['.get_string('upload:maxsize', 'sloodle', $maxsizedesc)."]</p><br />\n";
+        echo '<input type="submit" name="uploadfile" id="uploadfile" value="'.$struploadfile.'" /><br />'."\n";
+        echo '</fieldset><br />';
 
         // TODO: add a separate section allowing the import of a file elsewhere on the web
 
         // TODO: add a separate section allowing the import of a file already in the course/site files
 
         // Close the form
-        echo "</fieldset></form><br/>\n";
-
+        echo "</fieldset></form><br />\n";
     }
+
 
     /**
     * Display a drop-down menu of slides in the current presentation.
@@ -162,7 +163,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         }
         // Add an 'end' option
         if (!empty($curslide)) $endentrynum = $curslide->slideposition + 1;
-		else $endentrynum = 1;
+                else $endentrynum = 1;
         echo "<option value=\"{$endentrynum}\"";
         if (!$selected) echo " selected=\"selected\"";
         echo ">--".get_string('end', 'sloodle')."--</option>\n";
@@ -214,20 +215,21 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         global $CFG;
 
         $cmid = $presenter->cm->id;
-        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        //$context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $context = context_module::instance($cmid);
         $contextid = $context->id;
 
         // In Moodle 2, we make an itemid for the file api
         $itemid = time();
         
-        if (!file_exists($path)) error("Import file doesn't exist.");
+        if (!file_exists($path)) print_error("Import file doesn't exist.");
 
         // Start by running a compatibility check -- this just makes sure the extensions are loaded.
         $this->check_compatibility();
 
         // PHP 4 doesn't support recursive creation of folders, so we need to do this the manual way
 
-	// For Moodle 2, we upload to a temporary directory, then use the file api to move to the relevant place.
+        // For Moodle 2, we upload to a temporary directory, then use the file api to move to the relevant place.
         $dir_sitefiles = SLOODLE_IS_ENVIRONMENT_MOODLE_2 ? $CFG->dataroot.'/temp/sloodle' : $CFG->dataroot.'/'.SITEID;
         //$dir_sitefiles = $CFG->dataroot.'/'.SITEID;
         $dir_presenter = $dir_sitefiles.'/presenter';
@@ -237,22 +239,23 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         if (!file_exists($dir_import)) mkdir($dir_import);
         // Now check on last time that the import folder exists
         if (!file_exists($dir_import)) {
-            error("Failed to create directory for imported images. Please check the file permissions for your MoodleData folder.<br/><br/>Attempted to create: {$dir_import}");
+            print_error("Failed to create directory for imported images. Please check the file permissions for your MoodleData folder.<br /><br />Attempted to create: {$dir_import}");
         }
 
         // Construct the URL of the folder for viewing the files
         $dir_view = $CFG->wwwroot;
-	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-		$dir_view .= '/pluginfile.php/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid);
-	} else {
-		$dir_view .= '/file.php/'.SITEID.'/presenter/'.$presenter->cm->id;
-	}
+        if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+            $dir_view .= '/pluginfile.php/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid);
+        }
+        else {
+            $dir_view .= '/file.php/'.SITEID.'/presenter/'.$presenter->cm->id;
+        }
 
-	// In Moodle 2, make a file path, as distinct to the temporary file saving location
-	$fileapipath = '';
-	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-		$fileapipath = '/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid).'/';
-	} 
+        // In Moodle 2, make a file path, as distinct to the temporary file saving location
+        $fileapipath = '';
+        if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+            $fileapipath = '/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid).'/';
+        } 
 
         // Use the file name from the path if necessary
         if (empty($name)) {
@@ -277,8 +280,9 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         if ($result === false) {
             echo "<h3>",get_string('presenter:importfailed', 'sloodle'),"</h3>\n";
             echo "<h4>",get_string('presenter:importneedimagick', 'sloodle'),"</h4>\n";
-			$strcontinue = get_string('continue');
-			echo "<p style=\"text-align:center;\">( <a href=\"{$continueURL}\">{$strcontinue}</a> )</p>";
+                        $strcontinue = get_string('continue');
+            echo "<br />";
+            echo "<p style=\"text-align:center;\">( <a href=\"{$continueURL}\">{$strcontinue}</a> )</p>";
             return false;
         }
         echo "<h3>",get_string('presenter:importsuccessful', 'sloodle', $result),"</h3>\n";
@@ -310,18 +314,19 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         sloodle_debug('Loading PDF file... ');
         $mwand = NewMagickWand();
         if (!MagickReadImage($mwand, $srcfile)) {
-            sloodle_debug('failed.<br/>');
+            sloodle_debug('failed.<br />');
             return false;
         }
-        sloodle_debug('OK.<br/>');
+        sloodle_debug('OK.<br />');
         
         // Quick validation - position should start at 1. (-ve numbers mean "at the end")
         if ($position == 0) $position = 1;
 
         // Go through each page
-        sloodle_debug('Preparing to iterate through pages of document...<br/>');
+        sloodle_debug('Preparing to iterate through pages of document...<br />');
         MagickSetFirstIterator($mwand);
         $pagenum = 0; $page_position = -1;
+
         do {
             // Determine this page's position in the Presentation
             if ($position > 0) $page_position = $position + $pagenum;
@@ -335,9 +340,10 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             // Output the file
             sloodle_debug(" Writing page {$pagenum} to file...");
             if (!MagickWriteImage($mwand, $page_filename)) {
-                sloodle_debug('failed.<br/>');
-            } else {
-                sloodle_debug('OK.<br/>');
+                sloodle_debug('failed.<br />');
+            }
+            else {
+                sloodle_debug('OK.<br />');
             }
 
             if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
@@ -348,19 +354,20 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
                 }
            }
 
-
-
-    // Add the entry to the Presenter
+            // Add the entry to the Presenter
             sloodle_debug("  Adding slide \"{$page_slidename}\" to presentation at position {$page_position}... ");
             if (!$presenter->add_entry($page_slidesource, 'image', $page_slidename, $page_position)) {
-                sloodle_debug('failed.<br/>');
-            } else {
-                sloodle_debug('OK.<br/>');
+                sloodle_debug('failed.<br />');
+            }
+            else {
+                sloodle_debug('OK.<br />');
             }
             
         } while (MagickNextImage($mwand));
-        sloodle_debug('Finished.<br/>');
+
+        sloodle_debug('Finished.<br />');
         DestroyMagickWand($mwand);
+
         return $pagenum;
     }
 
@@ -384,29 +391,29 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         global $IMAGICK_CONVERT_PATH;
 
         // Do a security check -- has command-line execution of IMagick been disabled by the admin?
-        sloodle_debug("<br/><strong>Attempting to use ImageMagick by command-line.</strong><br/>");
+        sloodle_debug("<br /><strong>Attempting to use ImageMagick by command-line.</strong><br />");
         if (empty($IMAGICK_CONVERT_PATH)) {
             sloodle_debug(" ERROR: path to ImageMagick \'convert\' program is blank.");
             return false;
         }
         // Now make sure there are no quotation marks in the source/destination file and path names
         //  (these could be used to execute malicious commands on the server)
-        if (strpos($srcfile, "\"") !== false || strpos($destpath, "\"") !== false || strpos($destfile, "\"") !== false || strpos($destfileext, "\"") != false) error("Invalid file name -- please remove quotation marks from file names.");
+        if (strpos($srcfile, "\"") !== false || strpos($destpath, "\"") !== false || strpos($destfile, "\"") !== false || strpos($destfileext, "\"") != false) print_error("Invalid file name -- please remove quotation marks from file names.");
 
         // Construct the conversion command
-		$srcfile_shell_clean = escapeshellarg($srcfile);
-		$destpath_shell_clean = escapeshellarg($destpath.'/'.$destfile.'-');
-		$destfileext_shell_clean = escapeshellarg('.'.$destfileext);
-		//$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile_shell_clean}\" \"{$destpath_shell_clean}/{$destfile_shell_clean}-%d.{$destfileext_shell_clean}\"";
-		$cmd = "{$IMAGICK_CONVERT_PATH} -verbose {$srcfile_shell_clean} {$destpath_shell_clean}%d{$destfileext_shell_clean}";
-		if (substr(php_uname(), 0, 7) == "Windows") $cmd = 'start /B "" '.$cmd; // Windows compatibility
-		
-		sloodle_debug(" Executing shell command: {$cmd}<br/>");
-		$output = array();
+        $srcfile_shell_clean = escapeshellarg($srcfile);
+        $destpath_shell_clean = escapeshellarg($destpath.'/'.$destfile.'-');
+        $destfileext_shell_clean = escapeshellarg('.'.$destfileext);
+        //$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile_shell_clean}\" \"{$destpath_shell_clean}/{$destfile_shell_clean}-%d.{$destfileext_shell_clean}\"";
+        $cmd = "{$IMAGICK_CONVERT_PATH} -verbose {$srcfile_shell_clean} {$destpath_shell_clean}%d{$destfileext_shell_clean}";
+        if (substr(php_uname(), 0, 7) == "Windows") $cmd = 'start /B "" '.$cmd; // Windows compatibility
+              
+        sloodle_debug(" Executing shell command: {$cmd}<br />");
+        $output = array();
         $result = @exec($cmd, $output);
         // If all the output is empty, then execution failed
         if (empty($result) && empty($output)) {
-            sloodle_debug(" ERROR: execution of the shell command failed.<br/>");
+            sloodle_debug(" ERROR: execution of the shell command failed.<br />");
             //echo "<hr><pre>"; print_r($output); echo "</pre><hr>";
             return false;
         }
@@ -428,19 +435,19 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $page_slidename = "{$destname} (".($pagenum + 1).")";
             // Was this file created?
             if (file_exists($page_filename)) {
-
-		if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-			$registered = $this->_register_moodle_api_file( $page_filename, $itemid, $contextid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}"); 
-			@unlink($page_filename);
-			if (!$registered) {
-				return false;	
-			}
-		}
+                if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+                    $registered = $this->_register_moodle_api_file( $page_filename, $itemid, $contextid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}"); 
+                    @unlink($page_filename);
+                    if (!$registered) {
+                        return false;        
+                    }
+                }
 
                 // Add it to the Presenter
                 $presenter->add_entry($page_slidesource, 'image', $page_slidename, $page_position);
                 $pagenum++;
-            } else {
+            }
+            else {
                 $stop = true;
             }
         }
@@ -448,23 +455,23 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         return $pagenum;
     }
     
-    function _register_moodle_api_file( $tempfile, $itemid, $contextid, $fileapipath, $filename ) {
 
+    function _register_moodle_api_file( $tempfile, $itemid, $contextid, $fileapipath, $filename )
+    {
         $fs = get_file_storage();
 
         $fileinfo = array(
-            'contextid' => $contextid, // ID of context
-            'component' => 'mod_sloodle',     // usually = table name
-            'filearea' => 'presenter',     // usually = table name
-            'itemid' => $itemid,               // usually = ID of row in table
-            'filepath' => $fileapipath,
-            'filename' => $filename
+            'contextid' => $contextid,       // ID of context
+            'component' => 'mod_sloodle',    // usually = table name
+            'filearea'  => 'presenter',      // usually = table name
+            'itemid'    => $itemid,          // usually = ID of row in table
+            'filepath'  => $fileapipath,
+            'filename'  => $filename
         );
 
         $fs->create_file_from_pathname( $fileinfo, $tempfile);
 
-	return true;
-
+        return true;
     }
 
 
@@ -479,6 +486,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         return 'PDF Importer';
     }
 
+
     /**
     * Gets the human-readable description of this plugin.
     */
@@ -486,6 +494,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     {
         return 'Imports an Adbobe Acrobat (PDF) file into your Presentation. Each page becomes a single image slide.';
     }
+
 
     /**
     * Gets the internal version number of this plugin.
@@ -498,6 +507,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     {
         return 2010020400;
     }
+
 
     /**
     * Checks the compatibility of this plugin with the current installation.
@@ -536,11 +546,12 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $checkLocs[] = $IMAGICK_CONVERT_PATH;
             $checkLocs[] = '/usr/bin/convert';
             $checkLocs[] = '/usr/local/bin/convert';
-		// Edmund Edgar, 2011-10-30:
-		// Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
-		// Uncomment if you're really sure you want to do this.
-		//	$checkLocs[] = 'convert';
-		//	$checkLocs[] = 'convert.exe';
+
+            // Edmund Edgar, 2011-10-30:
+            // Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
+            // Uncomment if you're really sure you want to do this.
+            //        $checkLocs[] = 'convert';
+            //        $checkLocs[] = 'convert.exe';
             
             // Check for the presence of the ImageMagick convert program at each location
             foreach ($checkLocs as $loc) {
@@ -559,12 +570,14 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
                 }
             }
             $this->compatibility_summary .= get_string('presenter:convertnotfound', 'sloodle');
-        } else {
+        }
+        else {
             $this->compatibility_summary .= get_string('presenter:convertdisabled', 'sloodle');
         }
 
         return false;
     }
+
     
     /**
     * After check_compatibility() has been called, this function will return a string summarising the compatibility of the plugin.
@@ -576,6 +589,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         return $this->compatibility_summary;
     }
     
+
     /**
     * Run a full compatibility test and output the results to the webpage.
     * @return bool True if plugin is compatible, or false otherwise.
@@ -586,54 +600,53 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         
         // Check to see if the MagickWand extension is already loaded
         echo "<h3>MagickWand</h3>\n";
-        echo "Checking to see if MagickWand extension is loaded.<br/>";
-        if (extension_loaded('magickwand'))
-        {
-            echo "Success. MagickWand extension was already loaded.<br/>";
+        echo "Checking to see if MagickWand extension is loaded.<br />";
+        if (extension_loaded('magickwand')) {
+            echo "Success. MagickWand extension was already loaded.<br />";
             return true;
         }
-        echo "MagickWand extension not already loaded.<br/>";
+        echo "MagickWand extension not already loaded.<br />";
         
         // Attempt to load the extension, depending on OS.
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-        {
-            echo "Windows OS detected. Attempting to load 'php_magickwand.dll' extension dynamically.<br/>";
-	    if(function_exists('dl')) {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            echo "Windows OS detected. Attempting to load 'php_magickwand.dll' extension dynamically.<br />";
+            if(function_exists('dl')) {
                 @dl('php_magickwand.dll');
-	    }
-        } else {
-            echo "Attempting to load 'php_magickwand.so' extension dynamically.<br/>";
-	    if(function_exists('dl')) {
+            }
+        }
+        else {
+            echo "Attempting to load 'php_magickwand.so' extension dynamically.<br />";
+            if(function_exists('dl')) {
                 @dl('magickwand.so');
-	    }
+            }
         }
         // Check if MagickWand has been successfully loaded now.
-        if (extension_loaded('magickwand'))
-        {
-            echo "Success. MagickWand extension can be loaded dynamically.<br/>";
+        if (extension_loaded('magickwand')) {
+            echo "Success. MagickWand extension can be loaded dynamically.<br />";
             return true;
         }
-        echo "MagickWand extension could not be loaded. This plugin will attempt to use ImageMagick directly.<br/>";
+        echo "MagickWand extension could not be loaded. This plugin will attempt to use ImageMagick directly.<br />";
         echo "<h3>ImageMagick</h3>\n";
 
         // Only do this if the use of ImageMagick via shell commands has not been disabled
         if (!empty($IMAGICK_CONVERT_PATH)) {
-            echo "Attempting to auto-detect location of the ImageMagick 'convert' program.<br/>";
+            echo "Attempting to auto-detect location of the ImageMagick 'convert' program.<br />";
         
             // Build a list of locations to check for the ImageMagick program
             $checkLocs = array();
             $checkLocs[] = $IMAGICK_CONVERT_PATH;
             $checkLocs[] = '/usr/bin/convert';
             $checkLocs[] = '/usr/local/bin/convert';
-	    // Edmund Edgar, 2011-10-30:
-		// Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
-		// Uncomment if you're really sure you want to do this.
-		// $checkLocs[] = 'convert';
-		// $checkLocs[] = 'convert.exe';
+
+            // Edmund Edgar, 2011-10-30:
+            // Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
+            // Uncomment if you're really sure you want to do this.
+            // $checkLocs[] = 'convert';
+            // $checkLocs[] = 'convert.exe';
             
             // Check for the presence of the ImageMagick convert program at each location
             foreach ($checkLocs as $loc) {
-                echo "<br/>Checking for program at location: \"{$loc}\"...<br/>";
+                echo "<br />Checking for program at location: \"{$loc}\"...<br />";
             
                 // Make sure it's a safe command
                 $cmd = $loc.' -version';
@@ -642,23 +655,23 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
                 @exec($cmd, $output);
                                 
                 if (empty($output)) {
-                    echo " - path is not executable.<br/>";
-                } else if (strpos($output[0], 'ImageMagick') === false) {
-                    echo " - executable does not appear to belong to Imagemagick.<br>";
-                } else {
-                    echo "- success. This appears to be the ImageMagick 'convert' program.<br/>";
+                    echo " - path is not executable.<br />";
+                }
+                else if (strpos($output[0], 'ImageMagick') === false) {
+                    echo " - executable does not appear to belong to Imagemagick.<br />";
+                }
+                else {
+                    echo "- success. This appears to be the ImageMagick 'convert' program.<br />";
                     return true;
                 }
             }
-            echo "<br/>Unable to locate the ImageMagick 'convert' program.<br/>";
+            echo "<br />Unable to locate the ImageMagick 'convert' program.<br />";
             return false;
         }
         
-        echo "The use of ImageMagick by shell execution has been disabled.<br/>";
+        echo "The use of ImageMagick by shell execution has been disabled.<br />";
         return false;
     }
 
 }
 
-
-?>

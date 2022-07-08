@@ -24,7 +24,8 @@ if (!$courseid) {
 	error_output( 'Course ID missing');
 }
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+$controller_context = context_module::instance($controllerid);
 if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
 	error_output( 'Access denied');
 }
@@ -60,7 +61,7 @@ if (!$layoutid = $layout->insert()) {
         $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
-            error(get_string('objectauthnocontrollers','sloodle'));
+            print_error(get_string('objectauthnocontrollers','sloodle'));
             exit();
         }
 
@@ -71,7 +72,8 @@ if (!$layoutid = $layout->insert()) {
                 continue;
             }
             // Check that the person can authorise objects of this module
-            if (has_capability('mod/sloodle:objectauth', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            //if (has_capability('mod/sloodle:objectauth', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            if (has_capability('mod/sloodle:objectauth', context_module::instance($cm->id))) {
                 // Store this controller
                 $controllers[$cm->course][$cm->id] = $r;
             }

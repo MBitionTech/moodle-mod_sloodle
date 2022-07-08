@@ -14,8 +14,6 @@
 */
 
 
-
-
 /**
 * Base class for all SLOODLE plugins.
 * All SLOODLE plugins should be derived from this (directly or indirectly).
@@ -31,9 +29,7 @@
 */
 class SloodlePluginBase
 {
-
     // DATA //
-
 
     // OVERRIDABLE FUNCTIONS //
     // These are functions which can be overridden by sub-classes.
@@ -50,6 +46,7 @@ class SloodlePluginBase
         return strtolower(get_class($this));
     }
 
+
     /**
     * Gets the human-readable description of this plugin.
     * This should be overridden by base classes. If not, it will just return an empty string.
@@ -62,6 +59,7 @@ class SloodlePluginBase
         return '';
     }
 
+
     /**
     * Gets the identifier of this plugin.
     * This function MUST be overridden by sub-classes to return an ID that is unique to the category.
@@ -70,11 +68,12 @@ class SloodlePluginBase
     * @access public
     * @return string|bool The ID of this plugin, or boolean false if this is a base class and should not be instantiated as a plugin.
     */
-    function sloodle_get_plugin_id()
+    static function sloodle_get_plugin_id()
     {
         return false;
     }
     
+
     /**
     * Gets the category to which this plugin belongs.
     * For example, Presenters have two plugin categories: slides, and importers.
@@ -85,10 +84,11 @@ class SloodlePluginBase
     * @access public
     * @return string The name of this category of plugin.
     */
-    function get_category()
+    static function get_category()
     {
         return 'base';
     }
+
 
     /**
     * Gets the internal version number of this plugin.
@@ -103,6 +103,7 @@ class SloodlePluginBase
         return 0;
     }
 
+
     /**
     * Checks the compatibility of this plugin with the current installation.
     * Override this for any plugin which has non-standard requirements, such as relying on particular PHP extensions.
@@ -113,6 +114,7 @@ class SloodlePluginBase
     {
         return true;
     }
+
     
     /**
     * After check_compatibility() has been called, this function will return a string summarising the compatibility of the plugin.
@@ -123,6 +125,7 @@ class SloodlePluginBase
     {
         return '';
     }
+
     
     /**
     * Run a full compatibility test and output the results to the webpage.
@@ -135,5 +138,3 @@ class SloodlePluginBase
 
 }
 
-
-?>

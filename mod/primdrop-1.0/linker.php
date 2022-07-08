@@ -56,7 +56,7 @@
     // Authenticate the request, load the Sloodle Object assignment module, and validate the user
     $sloodle = new SloodleSession();
     $sloodle->authenticate_request();
-    $sloodle->load_module('sloodleobject', true);
+    $sloodle->load_module('sloodleobj', true);
     
     // Has user data been omitted?
     $uuid = $sloodle->request->get_avatar_uuid(false);
@@ -76,8 +76,10 @@
     
     // Check the requirements for allowing submissions
     $status = 1; // This means it's OK
+
     if (!$sloodle->module->user_can_submit($sloodle->user)) $status = -10201;
-    else if ($sloodle->module->user_has_submitted($sloodle->user) == true && $sloodle->module->resubmit_allowed() == false) $status = -10205;
+    else if ($sloodle->module->user_has_submitted($sloodle->user)==true && $sloodle->module->resubmit_allowed()==false) $status = -10205;
+    else if ($sloodle->module->is_maximum_objects()) $status = -10206;
     else if ($sloodle->module->is_too_early()) $status = -10202;
     else {
         $late = $sloodle->module->is_too_late();
@@ -99,7 +101,7 @@
         // No - just checking if the user can submit
         $sloodle->response->set_status_code(1);
         $sloodle->response->set_status_descriptor('OK');
-$sloodle->response->add_data_line('Checked assignment status');
+        $sloodle->response->add_data_line('Checked assign status');
         $sloodle->response->render_to_output();
         exit();
     }
@@ -121,15 +123,15 @@ $sloodle->response->add_data_line('Checked assignment status');
         // OK
         $sloodle->response->set_status_code(1);
         $sloodle->response->set_status_descriptor('OK');
-$sloodle->response->add_data_line('SUBMITTED OBJECT');
-    } else {
+        $sloodle->response->add_data_line('SUBMITTED OBJECT');
+    }
+    else {
         // Error
         $sloodle->response->set_status_code(-103);
         $sloodle->response->set_status_descriptor('SYSTEM');
-        $sloodle->response->add_data_line('Failed to add assignment data into database.');
+        $sloodle->response->add_data_line('Failed to add assign data into database.');
     }
     
     // Render the response
     $sloodle->response->render_to_output();
     exit();    
-?>

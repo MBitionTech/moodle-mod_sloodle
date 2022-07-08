@@ -64,8 +64,7 @@ if (!$quizobj->is_preview_user()) {
 if ($quizobj->is_preview_user() && $forcenew) {
     // To force the creation of a new preview, we set a finish time on the
     // current attempt (if any). It will then automatically be deleted below
-    $DB->set_field('quiz_attempts', 'timefinish', time(),
-            array('quiz' => $quizobj->get_quizid(), 'userid' => $USER->id));
+    $DB->set_field('quiz_attempts', 'timefinish', time(), array('quiz' => $quizobj->get_quizid(), 'userid' => $USER->id));
 }
 
 // Look for an existing attempt.
@@ -74,22 +73,21 @@ $lastattempt = end($attempts);
 
 // If an in-progress attempt exists, check password then redirect to it.
 if ($lastattempt && !$lastattempt->timefinish) {
-
     $currentattemptid = $lastattempt->id;
     $messages = $accessmanager->prevent_access();
-
-} else {
+}
+else {
     // Get number for the next or unfinished attempt
     if ($lastattempt && !$lastattempt->preview && !$quizobj->is_preview_user()) {
         $attemptnumber = $lastattempt->attempt + 1;
-    } else {
+    }
+    else {
         $lastattempt = false;
         $attemptnumber = 1;
     }
     $currentattemptid = null;
 
-    $messages = $accessmanager->prevent_access() +
-            $accessmanager->prevent_new_attempt(count($attempts), $lastattempt);
+    $messages = $accessmanager->prevent_access() + $accessmanager->prevent_new_attempt(count($attempts), $lastattempt);
 }
 
 // Check access.
@@ -100,12 +98,13 @@ if (!$quizobj->is_preview_user() && $messages) {
 
 $attemptid = null;
 
+//
 if ($currentattemptid) {
 
     $attemptid = $currentattemptid;
 
-} else {
-
+}
+else {
     // Delete any previous preview attempts belonging to this user.
     quiz_delete_previews($quizobj->get_quiz(), $USER->id);
 
@@ -113,128 +112,29 @@ if ($currentattemptid) {
     $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
     // API changes in 2.4. https://github.com/moodle/moodle/commit/8e771aed93eea08cc3e9410283f5354e02311281
+    // Create the new attempt and initialize the question sessions
     if ($CFG->version < 2012120303) { 
-
-        // Create the new attempt and initialize the question sessions
-        $attempt = quiz_create_attempt($quizobj->get_quiz(), $attemptnumber, $lastattempt, time(),
-                $quizobj->is_preview_user());
-
-    } else {
-
-        // Create the new attempt and initialize the question sessions
-        $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, time(),
-                $quizobj->is_preview_user());
-
+        $attempt = quiz_create_attempt($quizobj->get_quiz(), $attemptnumber, $lastattempt, time(), $quizobj->is_preview_user());
+    }
+    else {
+        $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, time(), $quizobj->is_preview_user());
     }
 
     if (!($quizobj->get_quiz()->attemptonlast && $lastattempt)) {
         // Starting a normal, new, quiz attempt.
-
-        // Fully load all the questions in this quiz.
-        $quizobj->preload_questions();
-        $quizobj->load_questions();
-
-        // Add them all to the $quba.
-        $idstoslots = array();
-        $questionsinuse = array_keys($quizobj->get_questions());
-        foreach ($quizobj->get_questions() as $i => $questiondata) {
-            if ($questiondata->qtype != 'random') {
-                if (!$quizobj->get_quiz()->shuffleanswers) {
-                    $questiondata->options->shuffleanswers = false;
-                }
-                $question = question_bank::make_question($questiondata);
-
-            } else {
-                $question = question_bank::get_qtype('random')->choose_other_question(
-                        $questiondata, $questionsinuse, $quizobj->get_quiz()->shuffleanswers);
-                if (is_null($question)) {
-                    $sloodle->response->quick_output(-1, 'QUIZ', 'The quiz did not have enough questions.', FALSE);
-                    exit();
-                }
-            }
-
-            $idstoslots[$i] = $quba->add_question($question, $questiondata->maxmark);
-            $questionsinuse[] = $question->id;
-        }
-
-        // Start all the questions.
-        if ($attempt->preview) {
-            $variantoffset = rand(1, 100);
-        } else {
-            $variantoffset = $attemptnumber;
-        }
-        $quba->start_all_questions(
-                new question_variant_pseudorandom_no_repeats_strategy($variantoffset),
-                time());
-
-        // Update attempt layout.
-        $newlayout = array();
-        foreach (explode(',', $attempt->layout) as $qid) {
-            if ($qid != 0) {
-                $newlayout[] = $idstoslots[$qid];
-            } else {
-                $newlayout[] = 0;
-            }
-        }
-        $attempt->layout = implode(',', $newlayout);
-
-    } else {
-        // Starting a subsequent attempt in each attempt builds on last mode.
-
-        $oldquba = question_engine::load_questions_usage_by_activity($lastattempt->uniqueid);
-
-        $oldnumberstonew = array();
-        foreach ($oldquba->get_attempt_iterator() as $oldslot => $oldqa) {
-            $newslot = $quba->add_question($oldqa->get_question(), $oldqa->get_max_mark());
-
-            $quba->start_question_based_on($newslot, $oldqa);
-
-            $oldnumberstonew[$oldslot] = $newslot;
-        }
-
-        // Update attempt layout.
-        $newlayout = array();
-        foreach (explode(',', $lastattempt->layout) as $oldslot) {
-            if ($oldslot != 0) {
-                $newlayout[] = $oldnumberstonew[$oldslot];
-            } else {
-                $newlayout[] = 0;
-            }
-        }
-        $attempt->layout = implode(',', $newlayout);
+        $attempt = quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, time());
     }
-
+    else {
+        // Starting a subsequent attempt in each attempt builds on last mode.
+        $attempt = quiz_start_attempt_built_on_last($quba, $attempt, $lastattempt); 
+    }
 
     // Save the attempt in the database.
     $transaction = $DB->start_delegated_transaction();
-    question_engine::save_questions_usage_by_activity($quba);
-    $attempt->uniqueid = $quba->get_id();
-    $attempt->id = $DB->insert_record('quiz_attempts', $attempt);
-
-    // Log the new attempt.
-    if ($attempt->preview) {
-        add_to_log($course->id, 'quiz', 'preview', 'view.php?id=' . $quizobj->get_cmid(),
-                $quizobj->get_quizid(), $quizobj->get_cmid());
-    } else {
-        add_to_log($course->id, 'quiz', 'attempt', 'review.php?attempt=' . $attempt->id,
-                $quizobj->get_quizid(), $quizobj->get_cmid());
-    }
-
-    // Trigger event
-    $eventdata = new stdClass();
-    $eventdata->component = 'mod_quiz';
-    $eventdata->attemptid = $attempt->id;
-    $eventdata->timestart = $attempt->timestart;
-    $eventdata->userid    = $attempt->userid;
-    $eventdata->quizid    = $quizobj->get_quizid();
-    $eventdata->cmid      = $quizobj->get_cmid();
-    $eventdata->courseid  = $quizobj->get_courseid();
-    events_trigger('quiz_attempt_started', $eventdata);
-
+    $attempt = quiz_attempt_save_started($quizobj, $quba, $attempt);
     $transaction->allow_commit();
 
     $attemptid = $attempt->id;
-
 } 
 
 
@@ -247,9 +147,7 @@ Some of this is probably duplicated with code originally from startattempt.php
 */
 
 $attemptobj = sloodle_quiz_attempt::create($attemptid);
-
-$quiz = $attemptobj->get_quiz();
-
+$quiz  = $attemptobj->get_quiz();
 $slots = $attemptobj->get_slots('all');
 
 if (empty($slots)) {
@@ -270,10 +168,9 @@ if ($attemptobj->get_userid() != $USER->id) {
 
 // Check capabilities and block settings
 if (!$attemptobj->is_preview_user()) {
-
     $attemptobj->require_capability('mod/quiz:attempt');
-
-} else {
+}
+else {
     //navigation_node::override_active_url($attemptobj->start_attempt_url());
     $sloodle->response->quick_output(-12315, 'QUIZ', 'You do not have permission to take the quiz. Moodle quizzes are often only open to students, not teachers.', FALSE);
     exit();
@@ -298,13 +195,11 @@ if (count($messages)) {
 $output = $PAGE->get_renderer('mod_quiz');
 if (!$attemptobj->is_preview_user() && $messages) {
     // TODO: SLOODLE ERROR
-    //print_error('attempterror', 'quiz', $attemptobj->view_url(),
-     //       $output->access_messages($messages));
+    //print_error('attempterror', 'quiz', $attemptobj->view_url(), $output->access_messages($messages));
 }
 
-add_to_log($attemptobj->get_courseid(), 'quiz', 'continue attempt',
-        'review.php?attempt=' . $attemptobj->get_attemptid(),
-        $attemptobj->get_quizid(), $attemptobj->get_cmid());
+//add_to_log($attemptobj->get_courseid(), 'quiz', 'continue attempt', 'review.php?attempt=' . $attemptobj->get_attemptid(), $attemptobj->get_quizid(), $attemptobj->get_cmid());
+sloodle_add_to_log($attemptobj->get_courseid(), 'mod_log', 'mod/quiz-1.0/linker_moodle_2_1_up.php', array('attempt'=>$attemptobj->get_attemptid()), 'quiz_up: continue attempt');
 
 
 /*
@@ -313,9 +208,7 @@ add_to_log($attemptobj->get_courseid(), 'quiz', 'continue attempt',
 *
 */
 
-
 if ($isnotify) {
-
     $transaction = $DB->start_delegated_transaction();
 
     if ($questionids != '') {
@@ -331,8 +224,8 @@ if ($isnotify) {
         exit();
     }
 
-     //   echo $attemptobj->get_question_attempt(1)->get_field_prefix();
-      //  exit;
+    //echo $attemptobj->get_question_attempt(1)->get_field_prefix();
+    //exit;
 
     $responseoptionindex = -1;
     //$attemptobj->process_all_actions(time(), array('answer'=>$quizresponse));
@@ -341,25 +234,25 @@ if ($isnotify) {
     foreach($slots as $slot) {
 
         $qa = $attemptobj->get_question_attempt($slot);
-        $q = $qa->get_question();
+        $q  = $qa->get_question();
 
         if ($q->id == $questionid) {
+            if (method_exists($q, 'get_order')) {
+                // The linker script returns the option ID, but we need its index for process_all_actions_for_slot.
+                $order = $q->get_order($qa);
+                $responseoptionindex = array_search( $quizresponse, $order );
 
-            // The linker script returns the option ID, but we need its index for process_all_actions_for_slot.
-            $order = $q->get_order($qa);
-            $responseoptionindex = array_search( $quizresponse, $order );
+                if ($responseoptionindex < 0) {
+                    $sloodle->response->quick_output(-12318, 'QUIZ', 'Response index not found.', FALSE);
+                    exit();
+                }
 
-            if ($responseoptionindex < 0) {
-                $sloodle->response->quick_output(-12318, 'QUIZ', 'Response index not found.', FALSE);
-                exit();
+                $submitteddata = array('answer'=>$responseoptionindex);
+                //i print "processing for $slot, $questionid $responseoptionindex";
+                $attemptobj->process_all_actions_for_slot($slot, $submitteddata, time());
             }
 
-            $submitteddata = array('answer'=>$responseoptionindex);
-            //print "processing for $slot, $questionid $responseoptionindex";
-            $attemptobj->process_all_actions_for_slot($slot, $submitteddata, time());
-
             $transaction->allow_commit();
-            
             break;
         }
     }
@@ -373,35 +266,32 @@ if ($isnotify) {
 
     //SloodleDebugLogger::log('DEBUG', "active object check");
     if (!is_null($sloodle->active_object)) {
-                //SloodleDebugLogger::log('DEBUG', "quiz has an active object");
-
+        //SloodleDebugLogger::log('DEBUG', "quiz has an active object");
         $sloodle->process_interaction('answerquestion', $scorechange);
         //$transaction->allow_commit();
-
     }
 
-
     $output = array();
-
-} else {
-
-/*
-    $pagequestions = explode(',', $pagelist);
-    $lastquestion = count($pagequestions);
+}
+//
+else {
+    //$pagequestions = explode(',', $pagelist);
+    //$lastquestion  = count($pagequestions);
+    $lastquestion  = 1;
 
     // TODO SLOODLE: Recheck this
     // Only output quiz data if a question has not been requetsed
-    */
     $output = array();
     
     // Can't see a way to access this - every bastard thing is protected...
     // Load all the questions and loop through them...
     $availablequestionids = array();
 
+    $localqnum = 0;
     foreach($slots as $slot) {
 
         $qa = $attemptobj->get_question_attempt($slot);
-        $q = $qa->get_question();
+        $q  = $qa->get_question();
 
         //var_dump($q);
         //var_dump($attemptobj->get_question_attempt($slot));
@@ -411,7 +301,6 @@ if ($isnotify) {
         //var_dump($attemptobj->get_behaviour());
         //exit;
         $availablequestionids[] = $q->id;
-
         $localqnum++;
 
         if ($limittoquestion == $q->id) {
@@ -440,11 +329,11 @@ if ($isnotify) {
                 $q->id,
                 $q->parent,
                 sloodle_clean_for_output($q->questiontext),
-                $q->defaultgrade ? $q->defaultgrade : 1,
+                1,//$q->defaultgrade ? $q->defaultgrade : 1,
                 $q->penalty,
                 $qtype,
                 $q->hidden,
-                $q->maxgrade,
+                0,//$q->maxgrade,
                 $q->single,
                 $shuffleanswers,
                 0 //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
@@ -454,37 +343,35 @@ if ($isnotify) {
             $outputoptions = array();
             // Go through each option
 
-            $ordered_option_keys = $q->get_order($qa);
-            $ops = $q->answers;             
+            if (method_exists($q, "get_order")) {
+                $ordered_option_keys = $q->get_order($qa);
+                $ops = $q->answers;             
 
-            $i=1;
-            foreach($ordered_option_keys as $option_key) {
+                $i=1;
+                foreach($ordered_option_keys as $option_key) {
+                    $op = $ops[$option_key];
+                    if (!is_object($op)) {
+                        continue; // Ignore this if there are no options (Prevents nasty PHP notices!)
+                    }
+                    $feedback = sloodle_clean_for_output($op->feedback);
 
-                $op = $ops[$option_key];
-                if (!is_object($op)) {
-                    continue; // Ignore this if there are no options (Prevents nasty PHP notices!)
+                    // If the feedback is too long, substitute a placeholder. 
+                    // The script will see that and grab the feedback in a separate request. 
+                    if (strlen($feedback) > 512) {
+                        $feedback = "[[LONG]]";
+                    }
+
+                    $outputoptions[] = array(
+                        'questionoption',
+                        $i,
+                        $op->id,
+                        $q->id,
+                        sloodle_clean_for_output($op->answer),
+                        $op->fraction,
+                        $feedback
+                    );
+                    $i++;
                 }
-
-                $feedback = sloodle_clean_for_output($op->feedback);
-
-                // If the feedback is too long, substitute a placeholder. 
-                // The script will see that and grab the feedback in a separate request. 
-                if (strlen($feedback) > 512) {
-                    $feedback = "[[LONG]]";
-                }
-
-                $outputoptions[] = array(
-                    'questionoption',
-                    $i,
-                    $op->id,
-                    $q->id,
-                    sloodle_clean_for_output($op->answer),
-                    $op->fraction,
-                    $feedback
-                );
-
-                $i++;
-
             }
             
             // Shuffle the options if necessary
@@ -494,29 +381,28 @@ if ($isnotify) {
         }
 
         /*
-      var_dump($attemptobj->quba->render_question($slot,
+        var_dump($attemptobj->quba->render_question($slot,
                       $this->get_display_options_with_edit_link($reviewing, $slot, $thispageurl),
                                       $this->quba->get_question($slot)->_number));
-      */
+        */
     }
 
     if ($limittoquestion == 0) {
-        $output[] = array('quiz',$quiz->attempts,$quiz->name,$quiz->timelimit,$quiz->id,$lastquestion);
-        $output[] = array('quizpages',1,1,join(',',$availablequestionids));
+        $output[] = array('quiz', $quiz->attempts, $quiz->name, $quiz->timelimit, $quiz->id, $lastquestion);
+        $output[] = array('quizpages', 1, 1, join(',', $availablequestionids));
     }
-
 
     $secondsleft = ($quiz->timeclose ? $quiz->timeclose : 999999999999) - time();
     //if ($isteacher) {
-    //  // For teachers ignore the quiz closing time
-    //  $secondsleft = 999999999999;
+    //    // For teachers ignore the quiz closing time
+    //    $secondsleft = 999999999999;
     //}
     // If time limit is set include floating timer.
     if ($quiz->timelimit > 0) {
         $output[] = array('seconds left',$secondsleft);
     }
-
 }
+
 
 /*
 *
@@ -529,51 +415,39 @@ if ($finishattempt) {
     $transaction = $DB->start_delegated_transaction();
 
     // Log the end of this attempt.
-    add_to_log($attemptobj->get_courseid(), 'quiz', 'close attempt',
-            'review.php?attempt=' . $attemptobj->get_attemptid(),
-            $attemptobj->get_quizid(), $attemptobj->get_cmid());
+    //add_to_log($attemptobj->get_courseid(), 'quiz', 'close attempt', 'review.php?attempt=' . $attemptobj->get_attemptid(), $attemptobj->get_quizid(), $attemptobj->get_cmid());
+    sloodle_add_to_log($attemptobj->get_courseid(), 'mod_log', 'mod/quiz-1.0/linker_moodle_2_1_up.php', array('attempt'=>$attemptobj->get_attemptid()), 'quiz_up: close attempt');
 
     // Update the quiz attempt record.
-
     try {
-
         // This seems to have changed somewhere between Moodle 2.1 and 2.3.
         // Try the old method first, then the new method if that fails.
         if (method_exists($attemptobj, 'finish_attempt')) {
             $attemptobj->finish_attempt(time());
-        } else {
+        }
+        else {
             $attemptobj->process_finish(time(), false);
         }
-
     /*
     } catch (question_out_of_sequence_exception $e) {
-        print_error('submissionoutofsequencefriendlymessage', 'question',
-                $attemptobj->attempt_url(null, $thispage));
+        print_error('submissionoutofsequencefriendlymessage', 'question', $attemptobj->attempt_url(null, $thispage));
     */
-
-
     } catch (Exception $e) {
         $sloodle->response->quick_output(-701, 'QUIZ', 'Closing quiz failed: '.$e->getMessage(), FALSE);
         exit();
     }
 
-
     // Send the user to the review page.
     $transaction->allow_commit();
 
-
-
-    // redirect('review.php?attempt='.$attempt->id);
+    //redirect('review.php?attempt='.$attempt->id);
     //$sloodle->response->quick_output(-701, 'QUIZ', 'Got to finishattempt - but do not yet have Sloodle code to handle it.', FALSE);
     //exit();
 }
 
-
 $sloodle->response->set_status_code(1);
 $sloodle->response->set_status_descriptor('QUIZ');
 $sloodle->response->set_data($output);
-
 $sloodle->response->render_to_output();
 
 exit;
-?>

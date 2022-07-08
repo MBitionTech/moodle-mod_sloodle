@@ -7,7 +7,7 @@ To avoid the need for a different release, we'll go through a layer of sloodle_ 
 We'll probably want to switch these out for the regular Moodle 2.0 calls when people have had a change to upgrade to Moodle 2.
 */
 
-        // Fetch a list of all distributor entries
+// Fetch a list of all distributor entries
 function sloodle_do_use_db_object() {
    global $CFG;
    return ($CFG->version > 2010060800); 

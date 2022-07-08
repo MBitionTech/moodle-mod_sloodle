@@ -37,9 +37,9 @@ $controllerid = $sloodle->request->required_param('sloodlecontrollerid');
 $objectname = $sloodle->request->optional_param('sloodleobjname');
 $extraParams = ($rezzeruuid == $childobjectuuid) ? array() : array( 'sloodlerezzeruuid' => $rezzeruuid );   
 
+
 // An object authorizing itself.
 if ($childobjectuuid == $rezzeruuid) {
-
     // configs come from a notecard
     $configs = array();
     $configs['sloodlecontrollerid'] = $controllerid;
@@ -71,7 +71,8 @@ if ($childobjectuuid == $rezzeruuid) {
             $sloodle->response->set_status_descriptor('OBJECT_AUTH');
             $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
         }
-    } else {
+    }
+    else {
         $authid = $ao->id;
         // already got it - clean out old configs
         sloodle_delete_records('sloodle_object_config', 'object', $authid); 
@@ -88,8 +89,8 @@ if ($childobjectuuid == $rezzeruuid) {
             }
         }
     }
-
 }
+
 
 //search for active_object table
 //create new active object for found record
@@ -98,7 +99,6 @@ $active_object= new SloodleActiveObject();
 $sloodle->response->add_data_line($childobjectuuid);
 
 if(!$active_object->loadByUUID( $childobjectuuid )){
-
     // Not a full registration - just the httpinurl and the uuid
     $active_object->httpinurl=$httpinurl;
     $active_object->uuid=$childobjectuuid;
@@ -116,19 +116,19 @@ if(!$active_object->loadByUUID( $childobjectuuid )){
     $sloodle->response->set_status_code(1);
     $sloodle->response->set_status_descriptor('OBJECT_AUTH');
     $sloodle->response->render_to_output();
-
-} else{
-
-     // If an object we've never seen before wants to tell us its http-in url
-     // ...we'll record it for now, but not do the rest of the registration.
-     // This means the object will get configured even if the request from the object gets to the server
-     // ...before the object that rezzed it has told us about it.
-     $active_object->httpinurl=$httpinurl;
-     if (!$active_object->save()) {                
+}
+else{
+    // If an object we've never seen before wants to tell us its http-in url
+    // ...we'll record it for now, but not do the rest of the registration.
+    // This means the object will get configured even if the request from the object gets to the server
+    // ...before the object that rezzed it has told us about it.
+    $active_object->httpinurl = $httpinurl;
+    if (!$active_object->save()) {                
         $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
         $sloodle->response->set_status_descriptor('OBJECT_AUTH');
         $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
-     }
+    }
+    $active_object->course->load($sloodle->course->course_object);
 
     $async_config = ( defined('SLOODLE_ASYNC_SEND_CONFIG') && SLOODLE_ASYNC_SEND_CONFIG);
 
@@ -149,4 +149,3 @@ if(!$active_object->loadByUUID( $childobjectuuid )){
     $sloodle->response->render_to_output();
 
 }//end else
-?>

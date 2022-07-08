@@ -53,7 +53,6 @@ class SloodlePluginManager
     */
     var $plugin_cache = array();
 
-    
 // FUNCTIONS //
 
     /**
@@ -61,10 +60,12 @@ class SloodlePluginManager
     * @param object &$_session Reference to the containing {@link SloodleSession} object, if available.
     * @access public
     */
-    function SloodlePluginManager(&$_session)
+    //function SloodlePluginManager(&$_session)
+    function __construct(&$_session)
     {
         if (!is_null($_session)) $this->_session = &$_session;
     }
+
 
     /**
     * Loads all available plugins from the specified folder.
@@ -119,6 +120,7 @@ class SloodlePluginManager
         return true;
     }
     
+
     /**
     * Dummy function included for error checking.
     */
@@ -126,6 +128,7 @@ class SloodlePluginManager
     {
         exit("***** Call to \"get_plugin_names\". This function is no longer valid. Please edit the code. *****");
     }
+
     
     /**
     * Gets an array of the names of all SLOODLE plugins, optionally filtered to a specific category.
@@ -139,7 +142,7 @@ class SloodlePluginManager
     {
         // Create an array to store our list of plugin IDs
         $plugins = array();
-		// Has a particular category been provided?
+        // Has a particular category been provided?
         if (is_string($category))
         {
             // Down-case the category name for compatibility
@@ -151,7 +154,8 @@ class SloodlePluginManager
                 // Add the ID to our array
                 $plugins[] = $pluginid;
             }
-        } else {
+        }
+        else {
             // Go through each category of plugins
             foreach ($this->plugin_class_names as $cat)
             {
@@ -165,6 +169,7 @@ class SloodlePluginManager
 
         return $plugins;
     }
+
     
     /**
     * Gets an array of the names of all SLOODLE plugin categories.
@@ -179,13 +184,13 @@ class SloodlePluginManager
         $plugincats = array();
         if (!is_array($this->plugin_class_names)) return $plugincats;
         // Go through each category of plugins and add it to our list
-        foreach ($this->plugin_class_names as $catname => $plugins)
-        {
+        foreach ($this->plugin_class_names as $catname => $plugins) {
             $plugincats[] = $catname;
         }
 
         return $plugincats;
     }
+
 
     /**
     * Gets an instance of the specified plugin.
@@ -197,9 +202,9 @@ class SloodlePluginManager
     */
     function get_plugin($plugincat, $pluginid, $forcenew = false)
     {
-		// Down-case the incoming category and ID for compatibility
+        // Down-case the incoming category and ID for compatibility
         $plugincat = strtolower($plugincat);
-		$pluginid = strtolower($pluginid);
+        $pluginid = strtolower($pluginid);
         
         // Attempt to retrieve the name of the plugin class, and make sure it exists
         if (empty($this->plugin_class_names[$plugincat][$pluginid])) return false;
@@ -215,4 +220,3 @@ class SloodlePluginManager
 
 }
 
-?>

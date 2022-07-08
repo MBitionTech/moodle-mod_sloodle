@@ -20,6 +20,5 @@ require_once(SLOODLE_LIBROOT.'/general.php');
 $type = optional_param('_type', 'module', PARAM_CLEAN);
 
 // View the course
-if (!sloodle_view($type)) error('SLOODLE: failed to display resource type');
+if (!sloodle_view($type)) print_error('SLOODLE: failed to display resource type');
 
-?>

@@ -19,6 +19,7 @@ require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
+
 $configVars = array();
 
 $layoutentryid = null;
@@ -60,12 +61,11 @@ if (!$controller->load( $configVars['controllerid'] )) {
         error_output('Could not load controller');
 }
 
-
-$controller_context = get_context_instance( CONTEXT_MODULE, $configVars['controllerid']);
+//$controller_context = get_context_instance( CONTEXT_MODULE, $configVars['controllerid']);
+$controller_context = context_module::instance($configVars['controllerid']);
 if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
         error_output( 'Access denied');
 }
-
 
 //var_dump($layoutentry);
 if (!$layoutentry->update()) {
@@ -78,6 +78,7 @@ $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
 if (count($active_objects) > 0) {
+    //
     foreach($active_objects as $ao) {
         if ($ao->configure_for_layout() || true) {
             $response = $ao->refreshConfig($async);

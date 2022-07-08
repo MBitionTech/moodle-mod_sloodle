@@ -19,6 +19,7 @@ require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
 /** General Sloodle functionality. */
 require_once(SLOODLE_LIBROOT.'/general.php');
 
+
 /**
 * Class for rendering a view of SLOODLE users.
 * @package sloodle
@@ -106,9 +107,11 @@ class sloodle_view_users extends sloodle_base_view
     /**
     * Constructor.
     */
-    function sloodle_view_users()
+    //function sloodle_view_users()
+    function __construct()
     {
     }
+
 
     /**
     * Check and process the request parameters.
@@ -119,11 +122,12 @@ class sloodle_view_users extends sloodle_base_view
     
         // Fetch our Moodle and SLOODLE course data
         $this->courseid = optional_param('course', SITEID, PARAM_INT);
-        if (!$this->course = sloodle_get_record('course', 'id', $this->courseid)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $this->courseid)) print_error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
-        if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+        if (!$this->sloodle_course->load($this->course)) print_error(get_string('failedcourseload', 'sloodle'));
 
-        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        //$this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+        $this->course_context = context_course::instance($this->course->id, IGNORE_MISSING);
         
         // Construct the course URL, and fetch the names
         $this->courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->courseid;
@@ -136,17 +140,16 @@ class sloodle_view_users extends sloodle_base_view
         $this->start = optional_param('start', 0, PARAM_INT);
         if ($this->start < 0) $this->start = 0;
 
-
         // Moodle 2 rendering functions like to know the course.
         // They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
         if ($this->course) {
-                global $PAGE;
-                if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
-                        $PAGE->set_course($this->course);
-                }
+            global $PAGE;
+            if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
+                $PAGE->set_course($this->course);
+            }
         }
-
     }
+
 
     /**
     * Check that the user is logged-in and has permission to alter course settings.
@@ -158,6 +161,7 @@ class sloodle_view_users extends sloodle_base_view
         if ($this->courseid != SITEID) require_capability('mod/sloodle:courseparticipate', $this->course_context);
     }
 
+
     /**
     * Print the course settings page header.
     */
@@ -168,6 +172,7 @@ class sloodle_view_users extends sloodle_base_view
         $navigation .= get_string('sloodleuserprofiles', 'sloodle');
         sloodle_print_header(get_string('sloodleuserprofiles', 'sloodle'), get_string('sloodleuserprofiles', 'sloodle'), $navigation, "", "", false);
     }
+
 
     /**
     * Render the view of the module or feature.
@@ -184,12 +189,11 @@ class sloodle_view_users extends sloodle_base_view
         // Open the main body section
         echo '<div style="text-align:center;padding-left:8px;padding-right:8px;">';
         
-        
-//------------------------------------------------------
-        
+        //------------------------------------------------------
         sloodle_print_box_start('generalbox boxwidthwide boxaligncenter');
         echo '<table style="text-align:left; vertical-align:top; margin-left:auto; margin-right:auto;">';
-// // SEARCH FORMS // //
+
+        // // SEARCH FORMS // //
         echo '<tr>';
 
         /*
@@ -199,9 +203,7 @@ class sloodle_view_users extends sloodle_base_view
         
         echo "<form action=\"{$CFG->wwwroot}/mod/sloodle/view.php\" method=\"get\">";
         echo '<input type="hidden" name="_type" value="users" />';
-
-        echo '<span style="font-weight:bold;">'.get_string('changecourse','sloodle').'</span><br/>';
-        
+        echo '<span style="font-weight:bold;">'.get_string('changecourse','sloodle').'</span><br />';
         echo '<select name="course" size="1">';
         
         // Get a list of all courses
@@ -209,100 +211,77 @@ class sloodle_view_users extends sloodle_base_view
         if (!$allcourses) $allcourses = array();
         foreach ($allcourses as $as) {
             // Is the user able to view this particular course?
-            if ($as->id == SITEID || has_capability('mod/sloodle:courseparticipate', get_context_instance(CONTEXT_COURSE, $as->id))) {
+            if ($as->id == SITEID || has_capability('mod/sloodle:courseparticipate', context_course::instance($as->id, IGNORE_MISSING))) {
                 // Output this as an option
                 echo "<option value=\"{$as->id}\"";
                 if ($as->id == $this->courseid) echo "selected";
                 echo ">{$as->fullname}</option>";
             }
         }
-        echo '</select><br/>';
-        
+        echo '</select><br />';
         echo '<input type="checkbox" value="true" name="sloodleonly"';
         if ($this->sloodleonly) echo "checked";
-        echo '/>'.get_string('showavatarsonly','sloodle').'<br/>';
+        echo '/>'.get_string('showavatarsonly','sloodle').'<br />';
         echo '<input type="submit" value="'.get_string('submit','sloodle').'" />';
-        
         echo '</form>';
-        
         echo '</td>';
         */
         
         // USER SEARCH FORM //
         echo '<td style="width:350px; border:solid 1px #bbbbbb; padding:4px; vertical-align:top; width:33%;">';    
-        
         echo "<form action=\"{$CFG->wwwroot}/mod/sloodle/view.php\" method=\"get\">";
         echo '<input type="hidden" name="_type" value="users" />';
-        
-        echo '<span style="font-weight:bold;">'.get_string('usersearch','sloodle').'</span><br/>';
-        
+        echo '<span style="font-weight:bold;">'.get_string('usersearch','sloodle').'</span><br />';
         echo '<input type="hidden" value="'.s($this->courseid).'" name="course"/>';
-        echo '<input type="text" value="'.$this->searchstr.'" name="search" size="30" maxlength="30"/><br/>';
-        
+        echo '<input type="text" value="'.$this->searchstr.'" name="search" size="30" maxlength="30"/><br />';
         echo '<input type="checkbox" value="true" name="sloodleonly"';
         if ($this->sloodleonly) echo "checked";
-        echo '/>'.get_string('showavatarsonly','sloodle').'<br/>';
-        
+        echo '/>'.get_string('showavatarsonly','sloodle').'<br />';
         echo '<input type="submit" value="'.get_string('submit','sloodle').'" />';
         echo '</form>';
-        
         echo '</td>';
-        
-        
         
         // AVATAR SEARCH //
         echo '<td style="width:350px; border:solid 1px #bbbbbb; padding:4px; vertical-align:top; width:33%;">';
-        //echo '<span style="font-weight:bold;">'.get_string('specialpages','sloodle').'</span><br/>';        
+        //echo '<span style="font-weight:bold;">'.get_string('specialpages','sloodle').'</span><br />';        
         echo "<form action=\"{$CFG->wwwroot}/mod/sloodle/view.php\" method=\"get\">";
         echo '<input type="hidden" name="_type" value="user" />';
-        
-        echo '<span style="font-weight:bold;">'.get_string('avatarsearch','sloodle').'</span><br/>';
-        
+        echo '<span style="font-weight:bold;">'.get_string('avatarsearch','sloodle').'</span><br />';
         echo '<input type="hidden" value="search" name="id"/>';
         echo '<input type="hidden" value="'.s($this->courseid).'" name="course"/>';
-        echo '<input type="text" value="'.s($this->searchstr).'" name="search" size="30" maxlength="30"/><br/>';
-        echo '<br/><input type="submit" value="'.get_string('submit','sloodle').'" />';
+        echo '<input type="text" value="'.s($this->searchstr).'" name="search" size="30" maxlength="30"/><br />';
+        echo '<br /><input type="submit" value="'.get_string('submit','sloodle').'" />';
         echo '</form>';
         echo '</td>';
-        
-        
-        
-// // - END FORMS - // //
+        // // - END FORMS - // //
+
         echo '</tr>';
         echo '</table>';
-        
 
         // Provide some admin-only links
-	$system_context = get_context_instance(CONTEXT_SYSTEM);
+        //$system_context = get_context_instance(CONTEXT_SYSTEM);
+        $system_context = context_system::instance();
         if ( has_capability('moodle/site:viewparticipants', $system_context) ) {
             echo '<p>';
-            
             /*
             // Might be useful to add a "show admins" link, since they are not normally 'enrolled' in any course
-            
             echo '&nbsp;&nbsp;|&nbsp;&nbsp;';*/
-            
             // Link to view all avatars on the site
             echo "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=user&amp;id=all\" title=\"".get_string('viewall','sloodle')."\">";
             print_string('viewall','sloodle');
             echo '</a>';
-            
             echo '</p>';
         }
         
         sloodle_print_box_end();
-
-        
-//------------------------------------------------------
-
+        //------------------------------------------------------
         
         // Are we searching for users?
-        if ($this->searchstr != NULL)
-        {
+        if ($this->searchstr != NULL) {
             // Display the search term
-            echo '<br/><span style="font-size:16pt; font-weight:bold;">'.get_string('usersearch','sloodle').': '.$this->searchstr.'</span><br/><br/>';
+            echo '<br /><span style="font-size:16pt; font-weight:bold;">'.get_string('usersearch','sloodle').': '.$this->searchstr.'</span><br /><br />';
             // Search the list of users
-           // $fulluserlist = get_users(true, $this->searchstr);
+            //$fulluserlist = get_users(true, $this->searchstr);
 
             //$fulluserlist = get_users_by_capability('mod/sloodle:courseparticipate', $this->course_context);
             $fulluserlist = get_users_by_capability($this->course_context, 'mod/sloodle:courseparticipate', 'u.id, u.firstname, u.lastname', 'u.firstname, u.lastname');
@@ -315,12 +294,11 @@ class sloodle_view_users extends sloodle_base_view
                     $userlist[] = $ful;
                 } 
             }
-            
-            
-        } else {
+        } 
+        else {
             // Getting all users in a course
             // Display the name of the course
-            echo '<br/><span style="font-size:18pt; font-weight:bold;">'.s($this->coursefullname).'</span><br/><br/>';
+            echo '<br /><span style="font-size:18pt; font-weight:bold;">'.s($this->coursefullname).'</span><br /><br />';
             // Obtain a list of all Moodle users enrolled in the specified course
             //$userlist = get_course_users($this->courseid, 'lastname, firstname', '', 'u.id, firstname, lastname');
 
@@ -330,11 +308,9 @@ class sloodle_view_users extends sloodle_base_view
         // Construct and display a table of Sloodle entries
         if ($userlist) {
             $sloodletable = new stdClass();
-            $sloodletable->head = array(    get_string('user', 'sloodle'),
-                                            get_string('avatar', 'sloodle')
-                                        );
+            $sloodletable->head  = array(get_string('user', 'sloodle'), get_string('avatar', 'sloodle'));
             $sloodletable->align = array('left', 'left');
-            $sloodletable->size = array('50%', '50%');
+            $sloodletable->size  = array('50%', '50%');
             
             // Check if our start is past the end of our results
             if ($this->start >= count($userlist)) $this->start = 0;
@@ -343,6 +319,7 @@ class sloodle_view_users extends sloodle_base_view
             $resultnum = 0;
             $resultsdisplayed = 0;
             $maxperpage = 20;
+
             foreach ($userlist as $u) {
                 // Only display this result if it is after our starting result number
                 if ($resultnum >= $this->start) {
@@ -374,7 +351,8 @@ class sloodle_view_users extends sloodle_base_view
                         // Add the avatar name(s) to the line
                         $line[] = "<a href=\"{$url_sloodleprofile}\">{$avnames}</a>";
                         
-                    } else {
+                    }
+                    else {
                         // The query failed - if we are showing only Sloodle-enabled users, then skip the rest
                         if ($this->sloodleonly) continue;
                         $line[] = '-';
@@ -415,8 +393,8 @@ class sloodle_view_users extends sloodle_base_view
             
             // Display the table
             sloodle_print_table($sloodletable);
-            
-        } else {
+        }
+        else {
             // Failed to query for list of users
             echo '<div style="font-weight:bold; color:red;">';
             print_string('nouserdata','sloodle');
@@ -424,11 +402,10 @@ class sloodle_view_users extends sloodle_base_view
         }
         echo '</div>';
         
-        
         // Close the main body section
         echo '</div>';
-
     }
+
 
     /**
     * Print the page footer.
@@ -439,6 +416,3 @@ class sloodle_view_users extends sloodle_base_view
     }
 
 }
-
-
-?>

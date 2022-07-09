@@ -48,7 +48,7 @@ class mod_sloodle_mod_form extends moodleform_mod
         // Are we adding a new instance?
         if (empty($this->_instance)) {
             // Yes - check for a 'type' parameter
-            $sloodletype = required_param('type', PARAM_TEXT);
+            // $sloodletype = required_param('type', PARAM_TEXT);  // MSU fix
         } 
         else {
             // Fetch the instance data

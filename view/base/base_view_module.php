@@ -142,7 +142,8 @@ class sloodle_base_view_module extends sloodle_base_view
         // Offer the user an 'update' button if they are allowed to edit the module
         $editbuttons = '';
         if ($this->canedit) {
-            $editbuttons = update_module_button($this->cm->id, $this->course->id, get_string('modulename', 'sloodle'));
+            // MSU fix - update_module_button() has been deprecated (https://tracker.moodle.org/browse/MDL-53765)
+            //$editbuttons = update_module_button($this->cm->id, $this->course->id, get_string('modulename', 'sloodle'));
         }
         // Display the header
         $navigation = "<a href=\"index.php?id={$this->course->id}\">".get_string('modulenameplural','sloodle')."</a> ->";

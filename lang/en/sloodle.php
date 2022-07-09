@@ -22,9 +22,8 @@ $string['accesslevel:staff'] = 'Staff';
 
 $string['accesslevelobject'] = 'Object Access Level';
 $string['accesslevelobject:desc'] = 'This determines who may access the object in-world';
-$string['accesslevelobject:use'] = 'Use object (SL / OpenSim)';
-$string['accesslevelobject:control'] = 'Control object (SL / OpenSim)';
-
+$string['accesslevelobject:use'] = 'Use object (OpenSim)';
+$string['accesslevelobject:control'] = 'Control object (OpenSim)';
 $string['accesslevelserver'] = 'Use object (Moodle)';
 $string['accesslevelserver:desc'] = 'This determines who may use the server resource';
 
@@ -82,7 +81,7 @@ $string['cfgnotecard:security'] = 'For security reasons, you should make sure th
 $string['cfgnotecard:setnote'] = 'Note: if you configure a SLOODLE Set, then it will automatically configure any other objects it creates (although you can still manually configure them if you want to).';
 
 $string['changecourse'] = 'Change Course';
-$string['choosecourse'] = 'Choose the course you want to use in Second Life/OpenSim.';
+$string['choosecourse'] = 'Choose the course you want to use in OpenSim.';
 $string['clickchangeit'] = 'Click here to change it';
 $string['clickhere'] = 'click here';
 $string['clicktodeleteentry'] = 'Click here to delete this entry.';
@@ -101,9 +100,9 @@ $string['confirmdelete'] = 'Are you sure?';
 $string['confirmdeleteuserobjects'] = 'Are you sure you want to delete all these user objects?';
 $string['controlaccess'] = 'You can control access to your courses by enabling or disabling the SLOODLE Controller';
 
-//$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between Second Life/OpenSim and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
+//$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between OpenSim and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
 
-$string['controllerinfo'] = 'This course is linked to learning activities in Second Life/OpenSim. This page is provided to allow students to check whether the Second Life/OpenSim interface is currently enabled, and for instructors to configure the interface.';
+$string['controllerinfo'] = 'This course is linked to learning activities in OpenSim. This page is provided to allow students to check whether the OpenSim interface is currently enabled, and for instructors to configure the interface.';
 $string['moduletype_controller_help'] = 'The controller links a Moodle course to a set of activities in a virtual world.';
 $string['moduletype_controller'] = 'Controlller';
 
@@ -228,7 +227,7 @@ $string['moduletype'] = 'Module Type';
 $string['moduletype:controller'] = 'Controller';
 $string['moduletype:distributor'] = 'Distributor';
 $string['moduletype:presenter'] = 'Presenter';
-$string['moduletype:map'] = 'Second Life/OpenSim Map';
+$string['moduletype:map'] = 'OpenSim Map';
 $string['moduletype:tracker'] = 'Tracker';
 
 
@@ -335,7 +334,7 @@ $string['of'] = 'of';
 $string['or'] = 'or';
 
 $string['pagecount'] = 'Page {$a->num} of {$a->total}';
-$string['postedfromsl'] = 'Posted from Second Life/OpenSim';
+$string['postedfromsl'] = 'Posted from OpenSim';
 $string['pendingavatarnotfound'] = 'Could not locate a pending entry for your avatar. Perhaps you are already registered?';
 $string['pendingallocations'] = 'Pending Allocations';
 $string['pendingavatars'] = 'Pending Avatars';
@@ -524,7 +523,7 @@ $string['welcometosloodle'] = 'Welcome to SLOODLE';
 $string['week'] = 'week';
 $string['weeks'] = 'weeks';
 
-$string['xmlrpc:unexpectedresponse'] = 'Not getting the expected XMLRPC response. Is Second Life/OpenSim broken again?';
+$string['xmlrpc:unexpectedresponse'] = 'Not getting the expected XMLRPC response. Is OpenSim broken again?';
 $string['xmlrpc:error'] = 'XMLRPC Error';
 $string['xmlrpc:channel'] = 'XMLRPC Channel';
 
@@ -613,12 +612,11 @@ $string['awards:interactwithobjectrequires']='To use object users must have:';
 
 $string['awards:notenoughmessage']='Insufficient currency message';
 
-$string['awards:help:icurrency']='If you select Lindens, then your students can withdraw money using a stipend giver. On the otherhand, iPoints are non monetary points you can award your students!'; 
-$string['help:maxpoints']='-->If you choose 1000 as the maximum points then students must accumulate 1000 points or higher in Second Life/OpenSim to acheive 100 percent grade  If however they only get 300 points in Second Life/OpenSim and the maximum points are set to 1000, then the grade achieved would be 300/1000  (30 percent)';                                    
+$string['awards:help:icurrency']='If you select Lindens, then your students can withdraw money using a stipend giver. On the otherhand, iPoints are non monetary points you can award your students!';
+$string['help:maxpoints']='-->If you choose 1000 as the maximum points then students must accumulate 1000 points or higher in OpenSim to achieve 100 percent grade  If however they only get 300 points in OpenSim and the maximum points are set to 1000, then the grade achieved would be 300/1000  (30 percent)';
 $string['awards:balanceUpdate']='Update';                   
-$string['awards:noneregistered']='No avatars registered in SLOODLE';  
-$string['awards:alreadywd2']=' You can not choose a lower allotment unless that user\'s avatar pays the stipend giver to credit their account'; 
-
+$string['awards:noneregistered']='No avatars registered in SLOODLE';
+$string['awards:alreadywd2']=' You can not choose a lower allotment unless that user\'s avatar pays the stipend giver to credit their account';
 $string['tracker:tasks'] = 'Assign';
 $string['tracker:objdesc'] = 'Task Description';
 $string['tracker:levelcompl'] = 'Level of Completion';
@@ -633,7 +631,6 @@ $string['tracker:time'] = 'Time';
 $string['tracker:selecttracker'] = 'Select Tracker';
 $string['tracker:notrackers'] = 'No trackers in your course';
 $string['tracker:requiredtasknotcompleted'] = 'You need to complete another task before you can use this object.';
-
 $string['layoutpage'] = 'Layouts';
 $string['layoutmanager:nopermission'] = 'You do not have permission to edit layouts';
 $string['layoutmanager:connectingtorezzer'] = 'Connecting';
@@ -642,7 +639,6 @@ $string['layoutmanager:savefailed'] = 'Save failed';
 $string['layoutmanager:Layouts'] = 'Layouts';
 $string['layoutmanager:layoutaddpageexplanation'] = 'This page shows the SLOODLE tools that will work for this course. Check and uncheck them to include them in your layout. <br /><br />You can rez the layout in-world using a Layout Rezzer object, then move the objects around to the places where you want them to be. ';
 $string['layoutmanager:layoutname'] = 'Layout Name';
-
 $string['layoutmanager:object'] = 'Object';
 $string['layoutmanager:module'] = 'Module';
 $string['layoutmanager:x'] = 'X';
@@ -653,7 +649,7 @@ $string['layoutmanager:currentobjects'] = 'Objects Already In Your Layout';
 $string['layoutmanager:addobjects'] = 'Add Objects To Your Layout';
 $string['awards:othersettings'] = 'Other Settings';
 $string['awards:assign'] = 'Attach earned points to an assign';
-$string['awards:refresh'] = 'This is the time in seconds that the awards will refresh the display in Second Life/OpenSim<br />';
+$string['awards:refresh'] = 'This is the time in seconds that the awards will refresh the display in OpenSim<br />';
 $string['awards:selectassign'] = 'Assign';
 $string['awards:teams'] = 'Teams';
 $string['awards:teamview'] = 'Team View';
@@ -690,8 +686,8 @@ $string['awards:points'] = 'Points';
 $string['awards:penalties'] = 'Penalties'; 
 $string['awards:score'] = 'Score'; 
 $string['awards:noscores'] = 'No scores have been recorded';     
-$string['logs:sloodlelogs'] = 'SLOODLE Logs';     
-$string['logs:info'] = 'On this page, you can see a list of logged activities that where logged via the logging.lsl script.  There are many events which are triggered by avatars in OpenSim and Second Life.  These can be either a touch, sensor, etc. For example, you can log whether an avatar sits on a chair, touches a button etc. These can all be logged in Moodle providing that the correct scripting has been applied to your objects.  See our wiki for more information';     
+$string['logs:sloodlelogs'] = 'SLOODLE Logs';
+$string['logs:info'] = 'On this page, you can see a list of logged activities that were logged via the logging.lsl script.  There are many events which are triggered by avatars in OpenSim.  These can be either a touch, sensor, etc. For example, you can log whether an avatar sits on a chair, touches a button etc. These can all be logged in Moodle provided that the correct scripting has been applied to your objects.  See our wiki for more information';
 $string['logs:view'] = 'View Logs'; 
 $string['logs:avname'] = 'Avatar'; 
 $string['logs:action'] = 'Action'; 
@@ -860,7 +856,7 @@ $string['freemail:maxcheck']='Max. number of email messages that script checks e
 $string['freemail:delete']='Delete messages that are larger than (bytes)';
 $string['freemail:adminmail']='Send Error Reports and Security bulletins to:';
 $string['freemail:gmailuse']='For Gmail use:  ';
-$string['freemail:explanation_wheretosend'] = 'To blog from Second Life or OpenSim, email a postcard to:';
+$string['freemail:explanation_wheretosend'] = 'To blog from OpenSim, email a postcard to:';
 $string['freemail:explanation_howtoblog'] = 'Put the title of your blog in the subject line and the text in the body of the email.';
 $string['freemail:testbutton'] = 'Click this button to test.';
 $string['freemail:delete_message'] = 'Skip message deletion. (May result in duplicate blog entries.';
